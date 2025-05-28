@@ -83,7 +83,7 @@ const Index = () => {
   }, [filteredData]);
 
   const marcasAfetadas = useMemo(() => {
-    const marcasData = {};
+    const marcasData: { [key: string]: { marca: string; horas: number; afetada: boolean } } = {};
     filteredData.forEach(item => {
       if (!marcasData[item.marca]) {
         marcasData[item.marca] = { marca: item.marca, horas: 0, afetada: false };
