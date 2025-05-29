@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -96,11 +97,11 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
   };
 
   const tableConfigs = [
-    { title: "Supervisor", data: supervisorList, icon: Users, gradient: "from-blue-600 to-blue-800" },
-    { title: "Promotor", data: promotorList.slice(0, 10), icon: User, gradient: "from-green-600 to-green-800" },
-    { title: "Marca", data: marcaList, icon: Package, gradient: "from-purple-600 to-purple-800" },
-    { title: "Loja", data: lojaList.slice(0, 10), icon: Building, gradient: "from-orange-600 to-orange-800" },
-    { title: "Família", data: familiaList, icon: Layers, gradient: "from-red-600 to-red-800" }
+    { title: "Supervisor", data: supervisorList, icon: Users, gradient: "from-purple-400 to-purple-600", bg: "bg-purple-50" },
+    { title: "Promotor", data: promotorList.slice(0, 10), icon: User, gradient: "from-blue-400 to-blue-600", bg: "bg-blue-50" },
+    { title: "Marca", data: marcaList, icon: Package, gradient: "from-pink-400 to-pink-600", bg: "bg-pink-50" },
+    { title: "Loja", data: lojaList.slice(0, 10), icon: Building, gradient: "from-indigo-400 to-indigo-600", bg: "bg-indigo-50" },
+    { title: "Família", data: familiaList, icon: Layers, gradient: "from-green-400 to-green-600", bg: "bg-green-50" }
   ];
 
   return (
@@ -112,28 +113,28 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
     >
       {tableConfigs.map((config, index) => (
         <motion.div key={config.title} variants={cardVariants}>
-          <Card className="shadow-2xl border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-white backdrop-blur-sm overflow-hidden">
+          <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm overflow-hidden">
             <CardHeader className={`bg-gradient-to-r ${config.gradient} text-white relative overflow-hidden`}>
-              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute inset-0 bg-white/10"></div>
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
               <CardTitle className="text-lg flex items-center gap-3 relative z-10">
                 <config.icon className="w-6 h-6" />
                 {config.title}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0 bg-slate-800/50">
+            <CardContent className={`p-0 ${config.bg}`}>
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-700/50 border-slate-600">
-                    <TableHead className="text-slate-200 font-semibold">
+                  <TableRow className="bg-white/50 border-purple-100">
+                    <TableHead className="text-purple-700 font-semibold">
                       {config.title}
                     </TableHead>
                     {config.title !== "Promotor" && (
-                      <TableHead className="text-slate-200 text-right font-semibold">
+                      <TableHead className="text-purple-700 text-right font-semibold">
                         Promotores Ausentes
                       </TableHead>
                     )}
-                    <TableHead className="text-slate-200 text-right font-semibold">
+                    <TableHead className="text-purple-700 text-right font-semibold">
                       Atendimentos Impactados
                     </TableHead>
                   </TableRow>
@@ -142,20 +143,20 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
                   {config.data.map((item: any, itemIndex) => (
                     <motion.tr 
                       key={itemIndex}
-                      className="border-slate-600/50 hover:bg-slate-700/30 transition-colors"
+                      className="border-purple-100/50 hover:bg-white/70 transition-colors"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: itemIndex * 0.05 }}
                     >
-                      <TableCell className="font-medium text-slate-200">
+                      <TableCell className="font-medium text-purple-700">
                         {item[Object.keys(item)[0]]}
                       </TableCell>
                       {config.title !== "Promotor" && (
-                        <TableCell className="text-right text-slate-300">
+                        <TableCell className="text-right text-purple-600">
                           {item.promotoresAusentes || item.promotoresAusentes}
                         </TableCell>
                       )}
-                      <TableCell className="text-right text-slate-300">
+                      <TableCell className="text-right text-purple-600">
                         {item.atendimentosImpactados}
                       </TableCell>
                     </motion.tr>

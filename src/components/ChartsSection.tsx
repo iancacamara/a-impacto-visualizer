@@ -44,14 +44,14 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
       initial="hidden"
       animate="visible"
     >
-      {/* Status dos Promotores - Gráfico de Pizza 3D */}
+      {/* Status dos Promotores - Gráfico de Pizza */}
       <motion.div variants={cardVariants} whileHover="hover">
-        <Card className="shadow-2xl border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-white backdrop-blur-sm overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-xl font-bold flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 rounded-lg backdrop-blur-sm">
-                <TrendingUp className="h-6 w-6 text-blue-400" />
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5"></div>
+          <CardHeader className="relative border-b border-purple-100">
+            <CardTitle className="text-xl font-bold flex items-center gap-3 text-purple-700">
+              <div className="p-2 bg-purple-100 rounded-lg backdrop-blur-sm">
+                <TrendingUp className="h-6 w-6 text-purple-500" />
               </div>
               Status dos Promotores
             </CardTitle>
@@ -70,7 +70,7 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
                       dataKey="value"
                       startAngle={90}
                       endAngle={450}
-                      stroke="rgba(255,255,255,0.1)"
+                      stroke="rgba(255,255,255,0.8)"
                       strokeWidth={2}
                     >
                       {statusData.map((entry, index) => (
@@ -79,10 +79,11 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
                     </Pie>
                     <Tooltip 
                       contentStyle={{
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        color: 'white'
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        border: '1px solid rgba(168,85,247,0.2)',
+                        borderRadius: '12px',
+                        color: '#6B46C1',
+                        boxShadow: '0 10px 25px rgba(168,85,247,0.1)'
                       }}
                     />
                   </PieChart>
@@ -96,14 +97,14 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <div className="w-4 h-4 rounded-full shadow-lg" style={{ backgroundColor: item.color }}></div>
-                      <span className="text-sm text-slate-300">{item.name}: {item.value}</span>
+                      <div className="w-4 h-4 rounded-full shadow-md" style={{ backgroundColor: item.color }}></div>
+                      <span className="text-sm text-purple-600 font-medium">{item.name}: {item.value}</span>
                     </motion.div>
                   ))}
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-400">
+              <div className="flex items-center justify-center h-64 text-purple-400">
                 <div className="text-center">
                   <BarChart className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p>Nenhum dado disponível para os filtros selecionados</p>
@@ -114,14 +115,14 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
         </Card>
       </motion.div>
 
-      {/* Registro por Tipo - Gráfico de Barras Moderno */}
+      {/* Registro por Tipo - Gráfico de Barras */}
       <motion.div variants={cardVariants} whileHover="hover">
-        <Card className="shadow-2xl border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-white backdrop-blur-sm overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-xl font-bold flex items-center gap-3">
-              <div className="p-2 bg-green-500/20 rounded-lg backdrop-blur-sm">
-                <Users className="h-6 w-6 text-green-400" />
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+          <CardHeader className="relative border-b border-purple-100">
+            <CardTitle className="text-xl font-bold flex items-center gap-3 text-purple-700">
+              <div className="p-2 bg-blue-100 rounded-lg backdrop-blur-sm">
+                <Users className="h-6 w-6 text-blue-500" />
               </div>
               Registro por Tipo de Contrato
             </CardTitle>
@@ -130,19 +131,20 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
             {tipoData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <RechartsBar data={tipoData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(168,85,247,0.1)" />
                   <XAxis 
                     dataKey="tipo" 
                     fontSize={12}
-                    tick={{ fill: 'rgba(255,255,255,0.7)' }}
+                    tick={{ fill: '#6B46C1' }}
                   />
-                  <YAxis tick={{ fill: 'rgba(255,255,255,0.7)' }} />
+                  <YAxis tick={{ fill: '#6B46C1' }} />
                   <Tooltip 
                     contentStyle={{
-                      backgroundColor: 'rgba(0,0,0,0.8)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '8px',
-                      color: 'white'
+                      backgroundColor: 'rgba(255,255,255,0.95)',
+                      border: '1px solid rgba(168,85,247,0.2)',
+                      borderRadius: '12px',
+                      color: '#6B46C1',
+                      boxShadow: '0 10px 25px rgba(168,85,247,0.1)'
                     }}
                   />
                   <Bar 
@@ -159,18 +161,18 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
                   />
                   <defs>
                     <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.9}/>
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
                       <stop offset="95%" stopColor="#10B981" stopOpacity={0.6}/>
                     </linearGradient>
                     <linearGradient id="redGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.9}/>
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.8}/>
                       <stop offset="95%" stopColor="#EF4444" stopOpacity={0.6}/>
                     </linearGradient>
                   </defs>
                 </RechartsBar>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-400">
+              <div className="flex items-center justify-center h-64 text-purple-400">
                 <div className="text-center">
                   <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p>Nenhum dado disponível para os filtros selecionados</p>
@@ -181,15 +183,15 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
         </Card>
       </motion.div>
 
-      {/* Impacto por Marca - Gráfico de Área com Gradiente */}
+      {/* Impacto por Marca - Gráfico de Área */}
       {marcasAfetadas.length > 0 && (
         <motion.div variants={cardVariants} whileHover="hover" className="lg:col-span-2">
-          <Card className="shadow-2xl border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-white backdrop-blur-sm overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10"></div>
-            <CardHeader className="relative">
-              <CardTitle className="text-xl font-bold flex items-center gap-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg backdrop-blur-sm">
-                  <Package className="h-6 w-6 text-purple-400" />
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-purple-500/5"></div>
+            <CardHeader className="relative border-b border-purple-100">
+              <CardTitle className="text-xl font-bold flex items-center gap-3 text-purple-700">
+                <div className="p-2 bg-pink-100 rounded-lg backdrop-blur-sm">
+                  <Package className="h-6 w-6 text-pink-500" />
                 </div>
                 Impacto por Marca (Horas Perdidas)
               </CardTitle>
@@ -197,18 +199,19 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
             <CardContent className="relative">
               <ResponsiveContainer width="100%" height={350}>
                 <AreaChart data={marcasAfetadas}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(168,85,247,0.1)" />
                   <XAxis 
                     dataKey="marca" 
-                    tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }}
+                    tick={{ fill: '#6B46C1', fontSize: 12 }}
                   />
-                  <YAxis tick={{ fill: 'rgba(255,255,255,0.7)' }} />
+                  <YAxis tick={{ fill: '#6B46C1' }} />
                   <Tooltip 
                     contentStyle={{
-                      backgroundColor: 'rgba(0,0,0,0.8)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '8px',
-                      color: 'white'
+                      backgroundColor: 'rgba(255,255,255,0.95)',
+                      border: '1px solid rgba(168,85,247,0.2)',
+                      borderRadius: '12px',
+                      color: '#6B46C1',
+                      boxShadow: '0 10px 25px rgba(168,85,247,0.1)'
                     }}
                   />
                   <Area 
@@ -220,7 +223,7 @@ const ChartsSection = ({ statusData, tipoData, marcasAfetadas }: ChartsSectionPr
                   />
                   <defs>
                     <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8}/>
+                      <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.6}/>
                       <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.1}/>
                     </linearGradient>
                   </defs>
