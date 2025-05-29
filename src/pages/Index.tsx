@@ -13,6 +13,7 @@ import { PromotorData, DashboardStats } from "../types/promoter";
 const Index = () => {
   const [promotorData, setPromotorData] = useState<PromotorData[]>(initialData);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   
   const { filters, setFilters, resetAllFilters, filteredData } = useFilters(promotorData);
   const chartData = useChartData(filteredData);
@@ -21,6 +22,12 @@ const Index = () => {
     setPromotorData(newData);
     setLastUpdate(new Date());
     resetAllFilters();
+  };
+
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+    // Aqui você pode implementar a lógica para filtrar os dados por data
+    // Por exemplo, filtrar promotorData baseado na data selecionada
   };
 
   // Extract unique values for filters
@@ -48,7 +55,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header lastUpdate={lastUpdate} onClearFilters={resetAllFilters} />
+      <Header 
+        lastUpdate={lastUpdate} 
+        onClearFilters={resetAllFilters}
+        selectedDate={selectedDate}
+        onDateChange={handleDateChange}
+      />
       
       <FilterBar
         filters={filters}
