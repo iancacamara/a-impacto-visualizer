@@ -1,7 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { motion } from "framer-motion";
+import { Users, User, Package, Building, Layers } from "lucide-react";
 import { PromotorData } from '../types/promoter';
 
 interface DetailedTablesProps {
@@ -9,7 +10,7 @@ interface DetailedTablesProps {
 }
 
 const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
-  // Dados agrupados por supervisor
+  // ... keep existing code (data processing logic)
   const supervisorData = filteredData
     .filter(p => p.status === "não registrou")
     .reduce((acc, curr) => {
@@ -25,12 +26,10 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
   const supervisorList = Object.values(supervisorData)
     .sort((a, b) => b.promotoresAusentes - a.promotoresAusentes);
 
-  // Dados por promotor
   const promotorList = filteredData
     .filter(p => p.status === "não registrou")
     .sort((a, b) => b.atendimentosImpactados - a.atendimentosImpactados);
 
-  // Dados por marca
   const marcaData = filteredData
     .filter(p => p.status === "não registrou")
     .reduce((acc, curr) => {
@@ -46,7 +45,6 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
   const marcaList = Object.values(marcaData)
     .sort((a, b) => b.atendimentosImpactados - a.atendimentosImpactados);
 
-  // Dados por loja
   const lojaData = filteredData
     .filter(p => p.status === "não registrou")
     .reduce((acc, curr) => {
@@ -62,7 +60,6 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
   const lojaList = Object.values(lojaData)
     .sort((a, b) => b.atendimentosImpactados - a.atendimentosImpactados);
 
-  // Dados por família
   const familiaData = filteredData
     .filter(p => p.status === "não registrou")
     .reduce((acc, curr) => {
@@ -78,183 +75,109 @@ const DetailedTables = ({ filteredData }: DetailedTablesProps) => {
   const familiaList = Object.values(familiaData)
     .sort((a, b) => b.atendimentosImpactados - a.atendimentosImpactados);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
+  };
+
+  const tableConfigs = [
+    { title: "Supervisor", data: supervisorList, icon: Users, gradient: "from-blue-600 to-blue-800" },
+    { title: "Promotor", data: promotorList.slice(0, 10), icon: User, gradient: "from-green-600 to-green-800" },
+    { title: "Marca", data: marcaList, icon: Package, gradient: "from-purple-600 to-purple-800" },
+    { title: "Loja", data: lojaList.slice(0, 10), icon: Building, gradient: "from-orange-600 to-orange-800" },
+    { title: "Família", data: familiaList, icon: Layers, gradient: "from-red-600 to-red-800" }
+  ];
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Tabela de Supervisores */}
-      <Card>
-        <CardHeader className="bg-blue-900 text-white">
-          <CardTitle className="text-lg">Supervisor</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-800 text-white">
-                <TableHead className="text-white">Supervisor</TableHead>
-                <TableHead className="text-white text-right">Promotores Ausentes</TableHead>
-                <TableHead className="text-white text-right">Atendimentos Impactados</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {supervisorList.map((item, index) => (
-                <TableRow key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                  <TableCell className="font-medium">{item.supervisor}</TableCell>
-                  <TableCell className="text-right">{item.promotoresAusentes}</TableCell>
-                  <TableCell className="text-right">{item.atendimentosImpactados}</TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="bg-blue-900 text-white font-bold">
-                <TableCell>Total</TableCell>
-                <TableCell className="text-right">
-                  {supervisorList.reduce((sum, item) => sum + item.promotoresAusentes, 0)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {supervisorList.reduce((sum, item) => sum + item.atendimentosImpactados, 0)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Tabela de Promotores */}
-      <Card>
-        <CardHeader className="bg-blue-900 text-white">
-          <CardTitle className="text-lg">Promotor</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-800 text-white">
-                <TableHead className="text-white">Promotor</TableHead>
-                <TableHead className="text-white text-right">Atendimentos Impactados</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {promotorList.slice(0, 10).map((item, index) => (
-                <TableRow key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                  <TableCell className="font-medium">{item.nome}</TableCell>
-                  <TableCell className="text-right">{item.atendimentosImpactados}</TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="bg-blue-900 text-white font-bold">
-                <TableCell>Total</TableCell>
-                <TableCell className="text-right">
-                  {promotorList.reduce((sum, item) => sum + item.atendimentosImpactados, 0)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Tabela de Marcas */}
-      <Card>
-        <CardHeader className="bg-blue-900 text-white">
-          <CardTitle className="text-lg">Marca</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-800 text-white">
-                <TableHead className="text-white">Marca</TableHead>
-                <TableHead className="text-white text-right">Promotores Ausentes</TableHead>
-                <TableHead className="text-white text-right">Atendimentos Impactados</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {marcaList.map((item, index) => (
-                <TableRow key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                  <TableCell className="font-medium">{item.marca}</TableCell>
-                  <TableCell className="text-right">{item.promotoresAusentes}</TableCell>
-                  <TableCell className="text-right">{item.atendimentosImpactados}</TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="bg-blue-900 text-white font-bold">
-                <TableCell>Total</TableCell>
-                <TableCell className="text-right">
-                  {marcaList.reduce((sum, item) => sum + item.promotoresAusentes, 0)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {marcaList.reduce((sum, item) => sum + item.atendimentosImpactados, 0)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Tabela de Lojas */}
-      <Card>
-        <CardHeader className="bg-blue-900 text-white">
-          <CardTitle className="text-lg">Loja</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-800 text-white">
-                <TableHead className="text-white">Loja</TableHead>
-                <TableHead className="text-white text-right">Promotores Ausentes</TableHead>
-                <TableHead className="text-white text-right">Atendimentos Impactados</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {lojaList.slice(0, 10).map((item, index) => (
-                <TableRow key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                  <TableCell className="font-medium">{item.loja}</TableCell>
-                  <TableCell className="text-right">{item.promotoresAusentes}</TableCell>
-                  <TableCell className="text-right">{item.atendimentosImpactados}</TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="bg-blue-900 text-white font-bold">
-                <TableCell>Total</TableCell>
-                <TableCell className="text-right">
-                  {lojaList.reduce((sum, item) => sum + item.promotoresAusentes, 0)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {lojaList.reduce((sum, item) => sum + item.atendimentosImpactados, 0)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Tabela de Famílias */}
-      <Card>
-        <CardHeader className="bg-blue-900 text-white">
-          <CardTitle className="text-lg">Família</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-800 text-white">
-                <TableHead className="text-white">Família</TableHead>
-                <TableHead className="text-white text-right">Promotores Ausentes</TableHead>
-                <TableHead className="text-white text-right">Atendimentos Impactados</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {familiaList.map((item, index) => (
-                <TableRow key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                  <TableCell className="font-medium">{item.familia}</TableCell>
-                  <TableCell className="text-right">{item.promotoresAusentes}</TableCell>
-                  <TableCell className="text-right">{item.atendimentosImpactados}</TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="bg-blue-900 text-white font-bold">
-                <TableCell>Total</TableCell>
-                <TableCell className="text-right">
-                  {familiaList.reduce((sum, item) => sum + item.promotoresAusentes, 0)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {familiaList.reduce((sum, item) => sum + item.atendimentosImpactados, 0)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+    <motion.div 
+      className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {tableConfigs.map((config, index) => (
+        <motion.div key={config.title} variants={cardVariants}>
+          <Card className="shadow-2xl border-0 bg-gradient-to-br from-slate-800 to-slate-900 text-white backdrop-blur-sm overflow-hidden">
+            <CardHeader className={`bg-gradient-to-r ${config.gradient} text-white relative overflow-hidden`}>
+              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
+              <CardTitle className="text-lg flex items-center gap-3 relative z-10">
+                <config.icon className="w-6 h-6" />
+                {config.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 bg-slate-800/50">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-700/50 border-slate-600">
+                    <TableHead className="text-slate-200 font-semibold">
+                      {config.title}
+                    </TableHead>
+                    {config.title !== "Promotor" && (
+                      <TableHead className="text-slate-200 text-right font-semibold">
+                        Promotores Ausentes
+                      </TableHead>
+                    )}
+                    <TableHead className="text-slate-200 text-right font-semibold">
+                      Atendimentos Impactados
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {config.data.map((item: any, itemIndex) => (
+                    <motion.tr 
+                      key={itemIndex}
+                      className="border-slate-600/50 hover:bg-slate-700/30 transition-colors"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: itemIndex * 0.05 }}
+                    >
+                      <TableCell className="font-medium text-slate-200">
+                        {item[Object.keys(item)[0]]}
+                      </TableCell>
+                      {config.title !== "Promotor" && (
+                        <TableCell className="text-right text-slate-300">
+                          {item.promotoresAusentes || item.promotoresAusentes}
+                        </TableCell>
+                      )}
+                      <TableCell className="text-right text-slate-300">
+                        {item.atendimentosImpactados}
+                      </TableCell>
+                    </motion.tr>
+                  ))}
+                  <TableRow className={`bg-gradient-to-r ${config.gradient} text-white font-bold border-0`}>
+                    <TableCell className="font-bold">Total</TableCell>
+                    {config.title !== "Promotor" && (
+                      <TableCell className="text-right font-bold">
+                        {config.data.reduce((sum: number, item: any) => sum + (item.promotoresAusentes || 0), 0)}
+                      </TableCell>
+                    )}
+                    <TableCell className="text-right font-bold">
+                      {config.data.reduce((sum: number, item: any) => sum + item.atendimentosImpactados, 0)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
 

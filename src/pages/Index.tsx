@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import FilterBar from "../components/FilterBar";
 import StatsCards from "../components/StatsCards";
+import ChartsSection from "../components/ChartsSection";
 import DetailedTables from "../components/DetailedTables";
 import FileUpload from "../components/FileUpload";
 import { useFilters } from "../hooks/useFilters";
+import { useChartData } from "../hooks/useChartData";
 import { promotorData as initialData } from "../data/promotorData";
 import { PromotorData, DashboardStats } from "../types/promoter";
 
@@ -14,6 +16,7 @@ const Index = () => {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   
   const { filters, setFilters, resetAllFilters, filteredData } = useFilters(promotorData);
+  const chartData = useChartData(filteredData);
 
   const handleDataLoad = (newData: PromotorData[]) => {
     setPromotorData(newData);
@@ -45,7 +48,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
       <Header lastUpdate={lastUpdate} onClearFilters={resetAllFilters} />
       
       <FilterBar
@@ -66,6 +69,12 @@ const Index = () => {
         <FileUpload onDataLoad={handleDataLoad} />
         
         <StatsCards stats={stats} />
+
+        <ChartsSection 
+          statusData={chartData.statusData}
+          tipoData={chartData.tipoData}
+          marcasAfetadas={chartData.marcasAfetadas}
+        />
 
         <DetailedTables filteredData={filteredData} />
       </div>
