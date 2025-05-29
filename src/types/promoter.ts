@@ -7,11 +7,16 @@ export interface PromotorData {
   loja: string;
   marca: string;
   categoria: string;
+  familia: string;
+  trade: string;
   horasRegistradas: number;
   horasPlanejadas: number;
+  atendimentosImpactados: number;
   data: string;
   regional: string;
   supervisor: string;
+  coordenador: string;
+  statusPromotor: string;
 }
 
 export interface FilterState {
@@ -23,4 +28,17 @@ export interface FilterState {
   selectedMarca: string;
   selectedCategoria: string;
   selectedSupervisor: string;
+  selectedTrade: string;
+  selectedFamilia: string;
+  selectedCoordenador: string;
+  selectedStatusPromotor: string;
+}
+
+export interface DashboardStats {
+  promotoresAusentes: number;
+  atendimentosImpactados: number;
+  totalPromotores: number;
+  lojasAfetadas: number;
+  marcasAfetadas: number;
+  familiasAfetadas: number;
 }

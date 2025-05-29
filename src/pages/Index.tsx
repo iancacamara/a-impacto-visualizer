@@ -1,35 +1,52 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import FilterBar from "../components/FilterBar";
 import StatsCards from "../components/StatsCards";
-import ChartsSection from "../components/ChartsSection";
-import DataTable from "../components/DataTable";
+import DetailedTables from "../components/DetailedTables";
+import FileUpload from "../components/FileUpload";
 import { useFilters } from "../hooks/useFilters";
-import { useChartData } from "../hooks/useChartData";
-import { promotorData } from "../data/promotorData";
+import { promotorData as initialData } from "../data/promotorData";
+import { PromotorData, DashboardStats } from "../types/promoter";
 
 const Index = () => {
+  const [promotorData, setPromotorData] = useState<PromotorData[]>(initialData);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  
   const { filters, setFilters, resetAllFilters, filteredData } = useFilters(promotorData);
-  const { statusData, tipoData, marcasAfetadas } = useChartData(filteredData);
+
+  const handleDataLoad = (newData: PromotorData[]) => {
+    setPromotorData(newData);
+    setLastUpdate(new Date());
+    resetAllFilters();
+  };
 
   // Extract unique values for filters
-  const regionais = [...new Set(promotorData.map(p => p.regional))].sort();
-  const lojas = [...new Set(promotorData.map(p => p.loja))].sort();
-  const marcas = [...new Set(promotorData.map(p => p.marca))].sort();
-  const categorias = [...new Set(promotorData.map(p => p.categoria))].sort();
-  const supervisores = [...new Set(promotorData.map(p => p.supervisor))].sort();
+  const regionais = [...new Set(promotorData.map(p => p.regional))].filter(Boolean).sort();
+  const lojas = [...new Set(promotorData.map(p => p.loja))].filter(Boolean).sort();
+  const marcas = [...new Set(promotorData.map(p => p.marca))].filter(Boolean).sort();
+  const categorias = [...new Set(promotorData.map(p => p.categoria))].filter(Boolean).sort();
+  const supervisores = [...new Set(promotorData.map(p => p.supervisor))].filter(Boolean).sort();
+  const trades = [...new Set(promotorData.map(p => p.trade))].filter(Boolean).sort();
+  const familias = [...new Set(promotorData.map(p => p.familia))].filter(Boolean).sort();
+  const coordenadores = [...new Set(promotorData.map(p => p.coordenador))].filter(Boolean).sort();
+  const statusPromotores = [...new Set(promotorData.map(p => p.statusPromotor))].filter(Boolean).sort();
 
   // Calculate statistics based on filtered data
-  const totalPromotores = filteredData.length;
-  const registraram = filteredData.filter(p => p.status === "registrou").length;
-  const naoRegistraram = filteredData.filter(p => p.status === "não registrou").length;
-  const lojasAfetadas = new Set(filteredData.filter(p => p.status === "não registrou").map(p => p.loja)).size;
-  const marcasAfetadasCount = new Set(filteredData.filter(p => p.status === "não registrou").map(p => p.marca)).size;
+  const stats: DashboardStats = {
+    promotoresAusentes: filteredData.filter(p => p.status === "não registrou").length,
+    atendimentosImpactados: filteredData
+      .filter(p => p.status === "não registrou")
+      .reduce((sum, p) => sum + p.atendimentosImpactados, 0),
+    totalPromotores: filteredData.length,
+    lojasAfetadas: new Set(filteredData.filter(p => p.status === "não registrou").map(p => p.loja)).size,
+    marcasAfetadas: new Set(filteredData.filter(p => p.status === "não registrou").map(p => p.marca)).size,
+    familiasAfetadas: new Set(filteredData.filter(p => p.status === "não registrou").map(p => p.familia)).size,
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <Header />
+    <div className="min-h-screen bg-gray-100">
+      <Header lastUpdate={lastUpdate} onClearFilters={resetAllFilters} />
       
       <FilterBar
         filters={filters}
@@ -39,29 +56,18 @@ const Index = () => {
         marcas={marcas}
         categorias={categorias}
         supervisores={supervisores}
-        onResetFilters={resetAllFilters}
+        trades={trades}
+        familias={familias}
+        coordenadores={coordenadores}
+        statusPromotores={statusPromotores}
       />
 
       <div className="container mx-auto px-6 py-8">
-        <StatsCards
-          totalPromotores={totalPromotores}
-          registraram={registraram}
-          naoRegistraram={naoRegistraram}
-          lojasAfetadas={lojasAfetadas}
-          marcasAfetadasCount={marcasAfetadasCount}
-        />
+        <FileUpload onDataLoad={handleDataLoad} />
+        
+        <StatsCards stats={stats} />
 
-        <ChartsSection
-          statusData={statusData}
-          tipoData={tipoData}
-          marcasAfetadas={marcasAfetadas}
-        />
-
-        <DataTable
-          filteredData={filteredData}
-          filters={filters}
-          setFilters={setFilters}
-        />
+        <DetailedTables filteredData={filteredData} />
       </div>
     </div>
   );

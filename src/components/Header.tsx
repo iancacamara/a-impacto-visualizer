@@ -1,9 +1,14 @@
 
 import React from 'react';
 
-const Header = () => {
+interface HeaderProps {
+  lastUpdate: Date;
+  onClearFilters?: () => void;
+}
+
+const Header = ({ lastUpdate, onClearFilters }: HeaderProps) => {
   return (
-    <header className="bg-white shadow-lg border-b border-slate-200">
+    <header className="bg-blue-900 text-white shadow-lg">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -13,13 +18,26 @@ const Header = () => {
               className="h-12 w-auto"
             />
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">PresenceControl Pro</h1>
-              <p className="text-sm text-slate-600">Sistema de Controle de Presença e Ausência</p>
+              <h1 className="text-2xl font-bold">PresenceControl Pro</h1>
+              <p className="text-sm opacity-90">Sistema de Controle de Presença e Ausência</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-sm text-slate-600">Relatório Diário</p>
-            <p className="text-lg font-semibold text-slate-800">{new Date().toLocaleDateString('pt-BR')}</p>
+            <div className="mb-2">
+              <span className="text-sm opacity-90">Atualizado em:</span>
+              <br />
+              <span className="text-lg font-mono">
+                {lastUpdate.toLocaleDateString('pt-BR')} {lastUpdate.toLocaleTimeString('pt-BR')}
+              </span>
+            </div>
+            {onClearFilters && (
+              <button
+                onClick={onClearFilters}
+                className="text-sm underline opacity-90 hover:opacity-100 italic"
+              >
+                Limpar filtros
+              </button>
+            )}
           </div>
         </div>
       </div>

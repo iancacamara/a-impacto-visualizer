@@ -12,6 +12,10 @@ export const useFilters = (promotorData: PromotorData[]) => {
     selectedMarca: "all",
     selectedCategoria: "all",
     selectedSupervisor: "all",
+    selectedTrade: "all",
+    selectedFamilia: "all",
+    selectedCoordenador: "all",
+    selectedStatusPromotor: "all",
   });
 
   const setFilters = (newFilters: Partial<FilterState>) => {
@@ -28,6 +32,10 @@ export const useFilters = (promotorData: PromotorData[]) => {
       selectedMarca: "all",
       selectedCategoria: "all",
       selectedSupervisor: "all",
+      selectedTrade: "all",
+      selectedFamilia: "all",
+      selectedCoordenador: "all",
+      selectedStatusPromotor: "all",
     });
   };
 
@@ -40,12 +48,18 @@ export const useFilters = (promotorData: PromotorData[]) => {
       const matchesMarca = filters.selectedMarca === "all" || item.marca === filters.selectedMarca;
       const matchesCategoria = filters.selectedCategoria === "all" || item.categoria === filters.selectedCategoria;
       const matchesSupervisor = filters.selectedSupervisor === "all" || item.supervisor === filters.selectedSupervisor;
+      const matchesTrade = filters.selectedTrade === "all" || item.trade === filters.selectedTrade;
+      const matchesFamilia = filters.selectedFamilia === "all" || item.familia === filters.selectedFamilia;
+      const matchesCoordenador = filters.selectedCoordenador === "all" || item.coordenador === filters.selectedCoordenador;
+      const matchesStatusPromotor = filters.selectedStatusPromotor === "all" || item.statusPromotor === filters.selectedStatusPromotor;
       
-      return matchesSearch && matchesType && matchesRegional && matchesLoja && matchesMarca && matchesCategoria && matchesSupervisor;
+      return matchesSearch && matchesType && matchesRegional && matchesLoja && matchesMarca && 
+             matchesCategoria && matchesSupervisor && matchesTrade && matchesFamilia && 
+             matchesCoordenador && matchesStatusPromotor;
     }).sort((a, b) => 
       filters.sortOrder === "desc" 
-        ? b.horasRegistradas - a.horasRegistradas 
-        : a.horasRegistradas - b.horasRegistradas
+        ? b.atendimentosImpactados - a.atendimentosImpactados 
+        : a.atendimentosImpactados - b.atendimentosImpactados
     );
   }, [promotorData, filters]);
 
