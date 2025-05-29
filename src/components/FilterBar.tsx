@@ -31,13 +31,13 @@ const FilterBar = ({
   statusPromotores
 }: FilterBarProps) => {
   return (
-    <div className="bg-gradient-to-r from-purple-100 to-pink-100 border-b border-purple-200">
+    <div className="bg-gray-50 border-b border-gray-200">
       <div className="container mx-auto px-6 py-4">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Loja</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Loja</label>
             <Select value={filters.selectedLoja} onValueChange={(value) => setFilters({ selectedLoja: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -50,9 +50,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Trade</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Trade</label>
             <Select value={filters.selectedTrade} onValueChange={(value) => setFilters({ selectedTrade: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -65,9 +65,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Marca</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Marca</label>
             <Select value={filters.selectedMarca} onValueChange={(value) => setFilters({ selectedMarca: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -80,9 +80,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Família</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Família</label>
             <Select value={filters.selectedFamilia} onValueChange={(value) => setFilters({ selectedFamilia: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -95,9 +95,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Promotor</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Promotor</label>
             <Select value={filters.filterType} onValueChange={(value) => setFilters({ filterType: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -113,9 +113,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Supervisor</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Supervisor</label>
             <Select value={filters.selectedSupervisor} onValueChange={(value) => setFilters({ selectedSupervisor: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -128,9 +128,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Coordenador</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Coordenador</label>
             <Select value={filters.selectedCoordenador} onValueChange={(value) => setFilters({ selectedCoordenador: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>
@@ -143,9 +143,9 @@ const FilterBar = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 text-purple-700">Status Promotor</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Status Promotor</label>
             <Select value={filters.selectedStatusPromotor} onValueChange={(value) => setFilters({ selectedStatusPromotor: value })}>
-              <SelectTrigger className="h-9 bg-white/80 border-purple-200 text-purple-700 hover:bg-white">
+              <SelectTrigger className="h-9 bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
                 <SelectValue placeholder="Tudo" />
               </SelectTrigger>
               <SelectContent>

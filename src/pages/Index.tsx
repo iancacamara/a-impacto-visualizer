@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "../components/Header";
 import FilterBar from "../components/FilterBar";
@@ -48,7 +47,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       <Header lastUpdate={lastUpdate} onClearFilters={resetAllFilters} />
       
       <FilterBar
