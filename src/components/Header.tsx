@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from "framer-motion";
-import { RefreshCw, Calendar } from "lucide-react";
+import { RefreshCw, Calendar, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface HeaderProps {
@@ -9,9 +9,22 @@ interface HeaderProps {
   onClearFilters?: () => void;
   selectedDate: string;
   onDateChange: (date: string) => void;
+  title?: string;
+  subtitle?: string;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
-const Header = ({ lastUpdate, onClearFilters, selectedDate, onDateChange }: HeaderProps) => {
+const Header = ({ 
+  lastUpdate, 
+  onClearFilters, 
+  selectedDate, 
+  onDateChange,
+  title = "PresenceControl Pro",
+  subtitle = "Sistema Avançado de Controle de Presença e Ausência",
+  showBackButton = false,
+  onBack
+}: HeaderProps) => {
   return (
     <motion.header 
       className="bg-white shadow-sm relative overflow-hidden border-b border-gray-100"
@@ -29,6 +42,16 @@ const Header = ({ lastUpdate, onClearFilters, selectedDate, onDateChange }: Head
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
+            {showBackButton && (
+              <motion.button
+                onClick={onBack}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ArrowLeft className="w-6 h-6 text-gray-600" />
+              </motion.button>
+            )}
             <div className="relative">
               <img 
                 src="/lovable-uploads/1419f815-c548-4d18-914c-14b8e01040e1.png" 
@@ -43,7 +66,7 @@ const Header = ({ lastUpdate, onClearFilters, selectedDate, onDateChange }: Head
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                PresenceControl Pro
+                {title}
               </motion.h1>
               <motion.p 
                 className="text-gray-600 text-sm font-medium mt-1"
@@ -51,7 +74,7 @@ const Header = ({ lastUpdate, onClearFilters, selectedDate, onDateChange }: Head
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                Sistema Avançado de Controle de Presença e Ausência
+                {subtitle}
               </motion.p>
             </div>
           </motion.div>
