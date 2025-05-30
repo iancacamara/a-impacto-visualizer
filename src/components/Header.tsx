@@ -20,8 +20,8 @@ const Header = ({
   onClearFilters, 
   selectedDate, 
   onDateChange,
-  title = "PresenceControl Pro",
-  subtitle = "Sistema Avançado de Controle de Presença e Ausência",
+  title = "Central de Operações",
+  subtitle = "PCP + Inteligência - Sistema Avançado de Controle e Gestão",
   showBackButton = false,
   onBack
 }: HeaderProps) => {
