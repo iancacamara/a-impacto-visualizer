@@ -53,84 +53,84 @@ const FilterBarBalanceamento = ({
             />
           </div>
 
-          <Select value={filters.selectedUF} onValueChange={(value) => setFilters({ selectedUF: value })}>
+          <Select value={filters.selectedUF} onValueChange={(value) => setFilters({ selectedUF: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="UF" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os UFs</SelectItem>
+              <SelectItem value="all">Todos os UFs</SelectItem>
               {ufs.map(uf => (
                 <SelectItem key={uf} value={uf}>{uf}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.selectedCidade} onValueChange={(value) => setFilters({ selectedCidade: value })}>
+          <Select value={filters.selectedCidade} onValueChange={(value) => setFilters({ selectedCidade: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="Cidade" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas as Cidades</SelectItem>
+              <SelectItem value="all">Todas as Cidades</SelectItem>
               {cidades.map(cidade => (
                 <SelectItem key={cidade} value={cidade}>{cidade}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.selectedRegional} onValueChange={(value) => setFilters({ selectedRegional: value })}>
+          <Select value={filters.selectedRegional} onValueChange={(value) => setFilters({ selectedRegional: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="Regional" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas as Regionais</SelectItem>
+              <SelectItem value="all">Todas as Regionais</SelectItem>
               {regionais.map(regional => (
                 <SelectItem key={regional} value={regional}>{regional}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.selectedGestorRegional} onValueChange={(value) => setFilters({ selectedGestorRegional: value })}>
+          <Select value={filters.selectedGestorRegional} onValueChange={(value) => setFilters({ selectedGestorRegional: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="Gestor Regional" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os Gestores</SelectItem>
+              <SelectItem value="all">Todos os Gestores</SelectItem>
               {gestoresRegionais.map(gestor => (
                 <SelectItem key={gestor} value={gestor}>{gestor}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.selectedCoordenador} onValueChange={(value) => setFilters({ selectedCoordenador: value })}>
+          <Select value={filters.selectedCoordenador} onValueChange={(value) => setFilters({ selectedCoordenador: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="Coordenador" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os Coordenadores</SelectItem>
+              <SelectItem value="all">Todos os Coordenadores</SelectItem>
               {coordenadores.map(coordenador => (
                 <SelectItem key={coordenador} value={coordenador}>{coordenador}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.selectedSupervisorLoja} onValueChange={(value) => setFilters({ selectedSupervisorLoja: value })}>
+          <Select value={filters.selectedSupervisorLoja} onValueChange={(value) => setFilters({ selectedSupervisorLoja: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="Supervisor Loja" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os Supervisores</SelectItem>
+              <SelectItem value="all">Todos os Supervisores</SelectItem>
               {supervisoresLoja.map(supervisor => (
                 <SelectItem key={supervisor} value={supervisor}>{supervisor}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={filters.selectedStatus} onValueChange={(value) => setFilters({ selectedStatus: value })}>
+          <Select value={filters.selectedStatus} onValueChange={(value) => setFilters({ selectedStatus: value === "all" ? "" : value })}>
             <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os Status</SelectItem>
+              <SelectItem value="all">Todos os Status</SelectItem>
               {statusOptions.map(status => (
                 <SelectItem key={status} value={status}>
                   {status.charAt(0).toUpperCase() + status.slice(1)}
