@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,19 +25,19 @@ const Dashboard = () => {
       stats: "7 Ausentes hoje"
     },
     {
+      title: "Roteirização Inteligente",
+      description: "Crie e otimize rotas para seus promotores com mapas interativos",
+      icon: MapPin,
+      gradient: "from-emerald-500 to-teal-500",
+      route: "/roteirizacao",
+      stats: "12 Rotas ativas"
+    },
+    {
       title: "Agenda & Planejamento",
       description: "Gerencie cronogramas e planejamento operacional",
       icon: Calendar,
-      gradient: "from-emerald-500 to-teal-500",
-      route: "/agenda",
-      stats: "Em breve"
-    },
-    {
-      title: "Roteirização",
-      description: "Otimize rotas e deslocamentos dos colaboradores",
-      icon: MapPin,
       gradient: "from-amber-500 to-orange-500",
-      route: "/roteirizacao",
+      route: "/agenda",
       stats: "Em breve"
     }
   ];
