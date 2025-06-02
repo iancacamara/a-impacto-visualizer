@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, BarChart3, Calendar, MapPin, Clock, TrendingUp } from "lucide-react";
+import { Users, BarChart3, Calendar, MapPin, Clock, TrendingUp, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
@@ -31,6 +32,14 @@ const Dashboard = () => {
       gradient: "from-emerald-500 to-teal-500",
       route: "/roteirizacao",
       stats: "12 Rotas ativas"
+    },
+    {
+      title: "Central de Vagas",
+      description: "Gerencie vagas compartilhadas e expansão com controle completo",
+      icon: Briefcase,
+      gradient: "from-purple-500 to-violet-500",
+      route: "/vagas",
+      stats: "15 Vagas ativas"
     },
     {
       title: "Agenda & Planejamento",
@@ -83,7 +92,7 @@ const Dashboard = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                Sistema Integrado de Gestão Departamental
+                PCP + Inteligência - Sistema Avançado de Controle e Gestão
               </motion.p>
             </div>
           </div>
@@ -106,7 +115,7 @@ const Dashboard = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {menuItems.map((item, index) => (
             <motion.div
               key={item.title}
