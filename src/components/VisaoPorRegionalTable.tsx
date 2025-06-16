@@ -3,46 +3,47 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Globe } from "lucide-react";
-import { BalanceamentoData } from '../types/balanceamento';
+import { PromotorAgrupado } from '../hooks/usePromotorGrouping';
 
 interface VisaoPorRegionalTableProps {
-  filteredData: BalanceamentoData[];
+  promotoresAgrupados: PromotorAgrupado[];
 }
 
-const VisaoPorRegionalTable = ({ filteredData }: VisaoPorRegionalTableProps) => {
-  // Visão por Regional exatamente como no Python
-  const regionalData = filteredData.reduce((acc, curr) => {
+const VisaoPorRegionalTable = ({ promotoresAgrupados }: VisaoPorRegionalTableProps) => {
+  // Visão por Regional - lógica agregada SEM usar teto individual
+  const regionalData = promotoresAgrupados.reduce((acc, curr) => {
     const key = curr.regional;
     if (!acc[key]) {
       acc[key] = {
         regional: key,
         total_promotores: 0,
         total_horas_mes: 0,
-        media_eficiencia: 0,
         horas_excedentes: 0,
-        horas_ociosas: 0,
-        eficienciaSum: 0
+        horas_ociosas: 0
       };
     }
     acc[key].total_promotores += 1;
-    acc[key].total_horas_mes += curr.horasRealizadas;
-    acc[key].horas_excedentes += curr.horasExcedentes;
-    acc[key].horas_ociosas += curr.horasOciosas;
-    acc[key].eficienciaSum += curr.eficiencia;
+    acc[key].total_horas_mes += curr.horasmes;
+    
+    // Horas excedentes: soma apenas valores positivos de diferenca_horas
+    if (curr.diferenca_horas > 0) {
+      acc[key].horas_excedentes += curr.diferenca_horas;
+    }
+    
+    // Horas ociosas: soma valores negativos em valor absoluto
+    if (curr.diferenca_horas < 0) {
+      acc[key].horas_ociosas += Math.abs(curr.diferenca_horas);
+    }
+    
     return acc;
   }, {} as Record<string, any>);
 
   const regionalList = Object.values(regionalData)
-    .map((item: any, index) => ({
-      index,
-      regional: item.regional,
-      total_promotores: item.total_promotores,
-      total_horas_mes: item.total_horas_mes,
-      media_eficiencia: Math.round(item.eficienciaSum / item.total_promotores),
-      horas_excedentes: item.horas_excedentes,
-      horas_ociosas: item.horas_ociosas
+    .map((item: any) => ({
+      ...item,
+      media_eficiencia: Math.round(item.total_horas_mes / item.total_promotores)
     }))
-    .sort((a, b) => b.total_horas_mes - a.total_horas_mes);
+    .sort((a: any, b: any) => b.total_horas_mes - a.total_horas_mes);
 
   return (
     <Card className="mb-6">
@@ -65,8 +66,8 @@ const VisaoPorRegionalTable = ({ filteredData }: VisaoPorRegionalTableProps) => 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {regionalList.map((item) => (
-              <TableRow key={item.index} className="hover:bg-gray-50">
+            {regionalList.map((item: any, index) => (
+              <TableRow key={index} className="hover:bg-gray-50">
                 <TableCell className="font-medium">{item.regional}</TableCell>
                 <TableCell className="text-center">{item.total_promotores}</TableCell>
                 <TableCell className="text-center">{item.total_horas_mes}</TableCell>

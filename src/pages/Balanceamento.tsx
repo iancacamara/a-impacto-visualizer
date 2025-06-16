@@ -10,6 +10,7 @@ import VisaoPorCoordenadorTable from "../components/VisaoPorCoordenadorTable";
 import VisaoPorLojaTable from "../components/VisaoPorLojaTable";
 import VisaoPorRegionalTable from "../components/VisaoPorRegionalTable";
 import { useFiltersBalanceamento } from "../hooks/useFiltersBalanceamento";
+import { usePromotorGrouping } from "../hooks/usePromotorGrouping";
 import { balanceamentoData as initialData } from "../data/balanceamentoData";
 import { BalanceamentoData } from "../types/balanceamento";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +24,11 @@ const Balanceamento = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [dadosCarregados, setDadosCarregados] = useState(false);
   
-  const { filters, setFilters, resetAllFilters, filteredData } = useFiltersBalanceamento(balanceamentoData);
+  // Agrupar promotores corretamente
+  const promotoresAgrupados = usePromotorGrouping(balanceamentoData);
+  
+  // Usar filtros com dados agrupados
+  const { filters, setFilters, resetAllFilters, filteredData } = useFiltersBalanceamento(promotoresAgrupados);
 
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
@@ -47,13 +52,13 @@ const Balanceamento = () => {
     });
   };
 
-  // Extract unique values for filters
-  const ufs = [...new Set(balanceamentoData.map(p => p.uf))].filter(Boolean).sort();
-  const cidades = [...new Set(balanceamentoData.map(p => p.cidade))].filter(Boolean).sort();
-  const regionais = [...new Set(balanceamentoData.map(p => p.regional))].filter(Boolean).sort();
-  const gestoresRegionais = [...new Set(balanceamentoData.map(p => p.gestorRegional))].filter(Boolean).sort();
-  const coordenadores = [...new Set(balanceamentoData.map(p => p.coordenador))].filter(Boolean).sort();
-  const supervisoresLoja = [...new Set(balanceamentoData.map(p => p.supervisorLoja))].filter(Boolean).sort();
+  // Extract unique values for filters usando promotores agrupados
+  const ufs = [...new Set(promotoresAgrupados.map(p => p.uf))].filter(Boolean).sort();
+  const cidades = [...new Set(promotoresAgrupados.map(p => p.cidade))].filter(Boolean).sort();
+  const regionais = [...new Set(promotoresAgrupados.map(p => p.regional))].filter(Boolean).sort();
+  const gestoresRegionais = [...new Set(promotoresAgrupados.map(p => p.gestorRegional))].filter(Boolean).sort();
+  const coordenadores = [...new Set(promotoresAgrupados.map(p => p.coordenador))].filter(Boolean).sort();
+  const supervisoresLoja = [...new Set(promotoresAgrupados.map(p => p.supervisorLoja))].filter(Boolean).sort();
   const statusOptions = ["excedente", "ocioso", "normal"];
 
   return (
@@ -78,7 +83,7 @@ const Balanceamento = () => {
         {dadosCarregados && (
           <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-green-700 font-medium">
-              ✅ Dados carregados com sucesso! Total de {balanceamentoData.length} registros processados.
+              ✅ Dados carregados com sucesso! Total de {balanceamentoData.length} registros processados em {promotoresAgrupados.length} promotores únicos.
             </p>
           </div>
         )}
@@ -95,16 +100,16 @@ const Balanceamento = () => {
           statusOptions={statusOptions}
         />
 
-        <StatsCardsBalanceamentoPython filteredData={filteredData} />
+        <StatsCardsBalanceamentoPython promotoresAgrupados={filteredData} />
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <TopOciosasTable filteredData={filteredData} />
-          <TopSobrecargaTable filteredData={filteredData} />
+          <TopOciosasTable promotoresAgrupados={filteredData} />
+          <TopSobrecargaTable promotoresAgrupados={filteredData} />
         </div>
 
-        <VisaoPorCoordenadorTable filteredData={filteredData} />
-        <VisaoPorLojaTable filteredData={filteredData} />
-        <VisaoPorRegionalTable filteredData={filteredData} />
+        <VisaoPorCoordenadorTable promotoresAgrupados={filteredData} />
+        <VisaoPorLojaTable promotoresAgrupados={filteredData} />
+        <VisaoPorRegionalTable promotoresAgrupados={filteredData} />
       </div>
     </div>
   );

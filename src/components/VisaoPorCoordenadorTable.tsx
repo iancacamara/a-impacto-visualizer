@@ -3,46 +3,47 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users } from "lucide-react";
-import { BalanceamentoData } from '../types/balanceamento';
+import { PromotorAgrupado } from '../hooks/usePromotorGrouping';
 
 interface VisaoPorCoordenadorTableProps {
-  filteredData: BalanceamentoData[];
+  promotoresAgrupados: PromotorAgrupado[];
 }
 
-const VisaoPorCoordenadorTable = ({ filteredData }: VisaoPorCoordenadorTableProps) => {
-  // Visão por Coordenador exatamente como no Python
-  const coordenadorData = filteredData.reduce((acc, curr) => {
+const VisaoPorCoordenadorTable = ({ promotoresAgrupados }: VisaoPorCoordenadorTableProps) => {
+  // Visão por Coordenador - lógica agregada SEM usar teto individual
+  const coordenadorData = promotoresAgrupados.reduce((acc, curr) => {
     const key = curr.coordenador;
     if (!acc[key]) {
       acc[key] = {
         coordenador: key,
         total_promotores: 0,
         total_horas_mes: 0,
-        media_eficiencia: 0,
         horas_excedentes: 0,
-        horas_ociosas: 0,
-        eficienciaSum: 0
+        horas_ociosas: 0
       };
     }
     acc[key].total_promotores += 1;
-    acc[key].total_horas_mes += curr.horasRealizadas;
-    acc[key].horas_excedentes += curr.horasExcedentes;
-    acc[key].horas_ociosas += curr.horasOciosas;
-    acc[key].eficienciaSum += curr.eficiencia;
+    acc[key].total_horas_mes += curr.horasmes;
+    
+    // Horas excedentes: soma apenas valores positivos de diferenca_horas
+    if (curr.diferenca_horas > 0) {
+      acc[key].horas_excedentes += curr.diferenca_horas;
+    }
+    
+    // Horas ociosas: soma valores negativos em valor absoluto
+    if (curr.diferenca_horas < 0) {
+      acc[key].horas_ociosas += Math.abs(curr.diferenca_horas);
+    }
+    
     return acc;
   }, {} as Record<string, any>);
 
   const coordenadorList = Object.values(coordenadorData)
-    .map((item: any, index) => ({
-      index,
-      coordenador: item.coordenador,
-      total_promotores: item.total_promotores,
-      total_horas_mes: item.total_horas_mes,
-      media_eficiencia: Math.round(item.eficienciaSum / item.total_promotores),
-      horas_excedentes: item.horas_excedentes,
-      horas_ociosas: item.horas_ociosas
+    .map((item: any) => ({
+      ...item,
+      media_eficiencia: Math.round(item.total_horas_mes / item.total_promotores)
     }))
-    .sort((a, b) => b.total_horas_mes - a.total_horas_mes);
+    .sort((a: any, b: any) => b.total_horas_mes - a.total_horas_mes);
 
   return (
     <Card className="mb-6">
@@ -65,8 +66,8 @@ const VisaoPorCoordenadorTable = ({ filteredData }: VisaoPorCoordenadorTableProp
             </TableRow>
           </TableHeader>
           <TableBody>
-            {coordenadorList.map((item) => (
-              <TableRow key={item.index} className="hover:bg-gray-50">
+            {coordenadorList.map((item: any, index) => (
+              <TableRow key={index} className="hover:bg-gray-50">
                 <TableCell className="font-medium">{item.coordenador}</TableCell>
                 <TableCell className="text-center">{item.total_promotores}</TableCell>
                 <TableCell className="text-center">{item.total_horas_mes}</TableCell>

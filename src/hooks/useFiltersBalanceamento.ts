@@ -1,8 +1,9 @@
 
 import { useState, useMemo } from 'react';
 import { BalanceamentoData, BalanceamentoFilters } from '../types/balanceamento';
+import { PromotorAgrupado } from './usePromotorGrouping';
 
-export const useFiltersBalanceamento = (balanceamentoData: BalanceamentoData[]) => {
+export const useFiltersBalanceamento = (promotoresAgrupados: PromotorAgrupado[]) => {
   const [filters, setFiltersState] = useState<BalanceamentoFilters>({
     searchTerm: "",
     selectedUF: "",
@@ -34,7 +35,7 @@ export const useFiltersBalanceamento = (balanceamentoData: BalanceamentoData[]) 
   };
 
   const filteredData = useMemo(() => {
-    return balanceamentoData.filter(item => {
+    return promotoresAgrupados.filter(item => {
       const matchesSearch = item.promotor.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
                            item.coordenador.toLowerCase().includes(filters.searchTerm.toLowerCase());
       const matchesUF = !filters.selectedUF || item.uf === filters.selectedUF;
@@ -43,7 +44,18 @@ export const useFiltersBalanceamento = (balanceamentoData: BalanceamentoData[]) 
       const matchesGestorRegional = !filters.selectedGestorRegional || item.gestorRegional === filters.selectedGestorRegional;
       const matchesCoordenador = !filters.selectedCoordenador || item.coordenador === filters.selectedCoordenador;
       const matchesSupervisorLoja = !filters.selectedSupervisorLoja || item.supervisorLoja === filters.selectedSupervisorLoja;
-      const matchesStatus = !filters.selectedStatus || item.status === filters.selectedStatus;
+      
+      // Mapear status do filtro para o status_final
+      let matchesStatus = true;
+      if (filters.selectedStatus) {
+        if (filters.selectedStatus === "excedente") {
+          matchesStatus = item.status_final === "SOBRECARGA";
+        } else if (filters.selectedStatus === "ocioso") {
+          matchesStatus = item.status_final === "OCIOSO";
+        } else if (filters.selectedStatus === "normal") {
+          matchesStatus = item.status_final === "DENTRO";
+        }
+      }
       
       return matchesSearch && matchesUF && matchesCidade && matchesRegional && 
              matchesGestorRegional && matchesCoordenador && matchesSupervisorLoja && matchesStatus;
@@ -52,7 +64,7 @@ export const useFiltersBalanceamento = (balanceamentoData: BalanceamentoData[]) 
         ? b.eficiencia - a.eficiencia 
         : a.eficiencia - b.eficiencia
     );
-  }, [balanceamentoData, filters]);
+  }, [promotoresAgrupados, filters]);
 
   return {
     filters,

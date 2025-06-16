@@ -3,18 +3,18 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Users, Clock, TrendingUp, TrendingDown } from "lucide-react";
-import { BalanceamentoData } from '../types/balanceamento';
+import { PromotorAgrupado } from '../hooks/usePromotorGrouping';
 
 interface StatsCardsBalanceamentoPythonProps {
-  filteredData: BalanceamentoData[];
+  promotoresAgrupados: PromotorAgrupado[];
 }
 
-const StatsCardsBalanceamentoPython = ({ filteredData }: StatsCardsBalanceamentoPythonProps) => {
-  // Calcular métricas exatamente como no código Python
-  const totalPromotores = filteredData.length;
-  const horasTotais = filteredData.reduce((sum, p) => sum + p.horasRealizadas, 0);
-  const ociosos = filteredData.filter(p => p.horasOciosas > 0).length;
-  const sobrecarga = filteredData.filter(p => p.horasExcedentes > 0).length;
+const StatsCardsBalanceamentoPython = ({ promotoresAgrupados }: StatsCardsBalanceamentoPythonProps) => {
+  // Calcular métricas exatamente como especificado
+  const totalPromotores = promotoresAgrupados.length;
+  const horasTotais = promotoresAgrupados.reduce((sum, p) => sum + p.horasmes, 0);
+  const ociosos = promotoresAgrupados.filter(p => p.status_final === "OCIOSO").length;
+  const sobrecarga = promotoresAgrupados.filter(p => p.status_final === "SOBRECARGA").length;
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -24,28 +24,28 @@ const StatsCardsBalanceamentoPython = ({ filteredData }: StatsCardsBalanceamento
 
   const statsData = [
     {
-      title: "Promotores",
+      title: "PROMOTORES",
       value: totalPromotores,
       icon: Users,
       color: "text-blue-600",
       bg: "bg-blue-50"
     },
     {
-      title: "Horas Totais",
+      title: "HORAS TOTAIS",
       value: horasTotais,
       icon: Clock,
       color: "text-green-600",
       bg: "bg-green-50"
     },
     {
-      title: "Ociosos",
+      title: "OCIOSOS",
       value: ociosos,
       icon: TrendingDown,
       color: "text-orange-600",
       bg: "bg-orange-50"
     },
     {
-      title: "Sobrecarga",
+      title: "SOBRECARGA",
       value: sobrecarga,
       icon: TrendingUp,
       color: "text-red-600",
