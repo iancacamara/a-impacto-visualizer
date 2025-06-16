@@ -10,11 +10,16 @@ interface StatsCardsBalanceamentoPythonProps {
 }
 
 const StatsCardsBalanceamentoPython = ({ promotoresAgrupados }: StatsCardsBalanceamentoPythonProps) => {
-  // Calcular métricas exatamente como especificado
-  const totalPromotores = promotoresAgrupados.length;
+  // Calcular métricas com base em promotores únicos (já agrupados)
+  const totalPromotores = promotoresAgrupados.length; // Agora é a contagem real de promotores únicos
   const horasTotais = promotoresAgrupados.reduce((sum, p) => sum + p.horasmes, 0);
   const ociosos = promotoresAgrupados.filter(p => p.diferenca_horas < 0).length;
   const sobrecarga = promotoresAgrupados.filter(p => p.diferenca_horas > 0).length;
+
+  console.log("STATS CARDS - Promotores únicos:", totalPromotores);
+  console.log("STATS CARDS - Horas totais:", horasTotais);
+  console.log("STATS CARDS - Ociosos:", ociosos);
+  console.log("STATS CARDS - Sobrecarga:", sobrecarga);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },

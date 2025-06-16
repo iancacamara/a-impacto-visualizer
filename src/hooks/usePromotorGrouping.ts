@@ -46,35 +46,37 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       return [];
     }
 
-    // Agrupar por nome do promotor
+    console.log("Dados brutos recebidos:", rawData.length, "linhas");
+
+    // Agrupar por nome do promotor (exatamente igual ao nome na planilha)
     const grupos = rawData.reduce((acc, curr) => {
-      const key = curr.promotor.trim();
-      if (!acc[key]) {
-        acc[key] = [];
+      const nomePromotor = curr.promotor.trim(); // Usar exatamente como vem da planilha
+      if (!acc[nomePromotor]) {
+        acc[nomePromotor] = [];
       }
-      acc[key].push(curr);
+      acc[nomePromotor].push(curr);
       return acc;
     }, {} as Record<string, BalanceamentoData[]>);
 
-    console.log("Grupos de promotores:", grupos);
+    console.log("Promotores únicos encontrados:", Object.keys(grupos).length);
+    console.log("Alguns exemplos de promotores:", Object.keys(grupos).slice(0, 5));
 
-    // Processar cada grupo de promotor
+    // Processar cada grupo de promotor para criar UM ÚNICO registro por promotor
     const resultado: PromotorAgrupado[] = [];
     
     Object.entries(grupos).forEach(([nomePromotor, linhas]) => {
       // Usar dados da primeira linha para informações não-agregáveis
       const primeiraLinha = linhas[0];
       
-      // Somar horas de todas as linhas do promotor
+      // SOMAR todas as horas de todas as linhas deste promotor
       const horasmes = linhas.reduce((sum, linha) => sum + linha.horasRealizadas, 0);
       
-      console.log(`Promotor: ${nomePromotor}, Horas totais: ${horasmes}, Linhas: ${linhas.length}`);
-      
-      // Usar perfil da primeira linha válida
-      const perfil = (primeiraLinha.perfil || 'promotor').toLowerCase().trim();
+      // Usar perfil da primeira linha
+      const perfilOriginal = primeiraLinha.perfil || 'promotor';
+      const perfilParaCalculo = perfilOriginal.toLowerCase().trim();
       
       // Calcular teto baseado no perfil
-      const teto = TETO_POR_PERFIL[perfil] || TETO_POR_PERFIL['promotor'];
+      const teto = TETO_POR_PERFIL[perfilParaCalculo] || TETO_POR_PERFIL['promotor'];
       
       // Calcular diferença
       const diferenca_horas = horasmes - teto;
@@ -90,8 +92,8 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       
       resultado.push({
         id: `promotor-${resultado.length + 1}`,
-        promotor: nomePromotor,
-        perfil: primeiraLinha.perfil || 'promotor', // Manter o perfil original
+        promotor: nomePromotor, // Nome exato da planilha
+        perfil: perfilOriginal, // Perfil original da planilha
         horasmes,
         teto,
         diferenca_horas,
@@ -109,7 +111,9 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       });
     });
 
-    console.log("Resultado final agrupado:", resultado);
+    console.log("Total de promotores únicos processados:", resultado.length);
+    console.log("Exemplo de promotor processado:", resultado[0]);
+    
     return resultado.sort((a, b) => b.horasmes - a.horasmes); // Ordenar por horas desc
   }, [rawData]);
 
