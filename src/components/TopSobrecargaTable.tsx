@@ -10,18 +10,22 @@ interface TopSobrecargaTableProps {
 }
 
 const TopSobrecargaTable = ({ promotoresAgrupados }: TopSobrecargaTableProps) => {
-  // Top 10 Sobrecarga - apenas com DIFERENCA_HORAS > 0, ordenar por DIFERENCA_HORAS DESC (mais positivos primeiro)
-  const topSobrecarga = promotoresAgrupados
-    .filter(p => p.diferenca_horas > 0)
-    .sort((a, b) => b.diferenca_horas - a.diferenca_horas) // DESC para pegar os mais positivos
+  // Filtrar apenas promotores com SOBRECARGA (diferenca_horas > 0)
+  const promotoresSobrecarga = promotoresAgrupados.filter(p => p.diferenca_horas > 0);
+  
+  console.log("Promotores com sobrecarga:", promotoresSobrecarga);
+  
+  // Ordenar por DIFERENCA_HORAS DESC e pegar top 10
+  const topSobrecarga = promotoresSobrecarga
+    .sort((a, b) => b.diferenca_horas - a.diferenca_horas)
     .slice(0, 10);
 
   return (
     <Card className="mb-6">
-      <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+      <CardHeader className="bg-gradient-to-r from-red-500 to-red-600 text-white">
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5" />
-          Top 10 - Sobrecarga
+          Top 10 - Sobrecarga ({promotoresSobrecarga.length} promotores)
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -36,17 +40,25 @@ const TopSobrecargaTable = ({ promotoresAgrupados }: TopSobrecargaTableProps) =>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {topSobrecarga.map((item, index) => (
-              <TableRow key={index} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{item.promotor}</TableCell>
-                <TableCell>{item.perfil}</TableCell>
-                <TableCell className="text-center">{item.horasmes}</TableCell>
-                <TableCell className="text-center">{item.teto}</TableCell>
-                <TableCell className="text-center text-green-600 font-semibold">
-                  +{item.diferenca_horas}
+            {topSobrecarga.length > 0 ? (
+              topSobrecarga.map((item, index) => (
+                <TableRow key={index} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">{item.promotor}</TableCell>
+                  <TableCell>{item.perfil}</TableCell>
+                  <TableCell className="text-center font-semibold">{item.horasmes}</TableCell>
+                  <TableCell className="text-center">{item.teto}</TableCell>
+                  <TableCell className="text-center text-red-600 font-semibold">
+                    +{item.diferenca_horas}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                  Nenhum promotor com sobrecarga encontrado
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

@@ -42,6 +42,10 @@ export interface PromotorAgrupado {
 
 export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
   const promotoresAgrupados = useMemo(() => {
+    if (!rawData || rawData.length === 0) {
+      return [];
+    }
+
     // Agrupar por nome do promotor
     const grupos = rawData.reduce((acc, curr) => {
       const key = curr.promotor.trim();
@@ -52,6 +56,8 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       return acc;
     }, {} as Record<string, BalanceamentoData[]>);
 
+    console.log("Grupos de promotores:", grupos);
+
     // Processar cada grupo de promotor
     const resultado: PromotorAgrupado[] = [];
     
@@ -61,6 +67,8 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       
       // Somar horas de todas as linhas do promotor
       const horasmes = linhas.reduce((sum, linha) => sum + linha.horasRealizadas, 0);
+      
+      console.log(`Promotor: ${nomePromotor}, Horas totais: ${horasmes}, Linhas: ${linhas.length}`);
       
       // Usar perfil da primeira linha válida
       const perfil = (primeiraLinha.perfil || 'promotor').toLowerCase().trim();
@@ -83,7 +91,7 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       resultado.push({
         id: `promotor-${resultado.length + 1}`,
         promotor: nomePromotor,
-        perfil,
+        perfil: primeiraLinha.perfil || 'promotor', // Manter o perfil original
         horasmes,
         teto,
         diferenca_horas,
@@ -101,7 +109,8 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       });
     });
 
-    return resultado;
+    console.log("Resultado final agrupado:", resultado);
+    return resultado.sort((a, b) => b.horasmes - a.horasmes); // Ordenar por horas desc
   }, [rawData]);
 
   return promotoresAgrupados;

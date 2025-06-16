@@ -10,40 +10,29 @@ interface VisaoPorCoordenadorTableProps {
 }
 
 const VisaoPorCoordenadorTable = ({ promotoresAgrupados }: VisaoPorCoordenadorTableProps) => {
-  // Visão por Coordenador - lógica agregada SEM usar teto individual
+  // Agrupar por coordenador
   const coordenadorData = promotoresAgrupados.reduce((acc, curr) => {
     const key = curr.coordenador;
     if (!acc[key]) {
       acc[key] = {
         coordenador: key,
         total_promotores: 0,
-        total_horas_mes: 0,
-        horas_excedentes: 0,
-        horas_ociosas: 0
+        total_horas_mes: 0
       };
     }
     acc[key].total_promotores += 1;
     acc[key].total_horas_mes += curr.horasmes;
-    
-    // Horas excedentes: soma apenas DIFERENCA_HORAS > 0
-    if (curr.diferenca_horas > 0) {
-      acc[key].horas_excedentes += curr.diferenca_horas;
-    }
-    
-    // Horas ociosas: soma DIFERENCA_HORAS < 0 (valor absoluto)
-    if (curr.diferenca_horas < 0) {
-      acc[key].horas_ociosas += Math.abs(curr.diferenca_horas);
-    }
-    
     return acc;
   }, {} as Record<string, any>);
 
   const coordenadorList = Object.values(coordenadorData)
     .map((item: any) => ({
       ...item,
-      media_eficiencia: Math.round(item.total_horas_mes / item.total_promotores)
+      media: Math.round(item.total_horas_mes / item.total_promotores) // Divisão simples
     }))
     .sort((a: any, b: any) => b.total_horas_mes - a.total_horas_mes);
+
+  console.log("Dados por coordenador:", coordenadorList);
 
   return (
     <Card className="mb-6">
@@ -58,22 +47,18 @@ const VisaoPorCoordenadorTable = ({ promotoresAgrupados }: VisaoPorCoordenadorTa
           <TableHeader>
             <TableRow className="bg-gray-800 text-white">
               <TableHead className="text-white font-semibold">Coordenador</TableHead>
-              <TableHead className="text-white font-semibold">Total_Promotores</TableHead>
-              <TableHead className="text-white font-semibold">Total_Horas_Mes</TableHead>
-              <TableHead className="text-white font-semibold">Media_Eficiencia</TableHead>
-              <TableHead className="text-white font-semibold">Horas_Excedentes</TableHead>
-              <TableHead className="text-white font-semibold">Horas_Ociosas</TableHead>
+              <TableHead className="text-white font-semibold">Total Horas Mês</TableHead>
+              <TableHead className="text-white font-semibold">Total Promotores</TableHead>
+              <TableHead className="text-white font-semibold">Média</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {coordenadorList.map((item: any, index) => (
               <TableRow key={index} className="hover:bg-gray-50">
                 <TableCell className="font-medium">{item.coordenador}</TableCell>
+                <TableCell className="text-center font-semibold text-blue-600">{item.total_horas_mes}</TableCell>
                 <TableCell className="text-center">{item.total_promotores}</TableCell>
-                <TableCell className="text-center">{item.total_horas_mes}</TableCell>
-                <TableCell className="text-center">{item.media_eficiencia}</TableCell>
-                <TableCell className="text-center">{item.horas_excedentes}</TableCell>
-                <TableCell className="text-center">{item.horas_ociosas}</TableCell>
+                <TableCell className="text-center font-semibold">{item.media}</TableCell>
               </TableRow>
             ))}
           </TableBody>
