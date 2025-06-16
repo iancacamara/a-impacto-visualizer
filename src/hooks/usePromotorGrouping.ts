@@ -46,54 +46,44 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       return [];
     }
 
-    console.log("=== INÍCIO DO PROCESSAMENTO ===");
+    console.log("=== INÍCIO DO PROCESSAMENTO (CORRIGIDO) ===");
     console.log("Total de linhas na planilha:", rawData.length);
     
-    // Log dos primeiros registros para verificar os dados
-    console.log("Primeiros 3 registros:", rawData.slice(0, 3).map(r => ({
-      promotor: r.promotor,
-      horasRealizadas: r.horasRealizadas,
-      perfil: r.perfil
-    })));
-
-    // Criar um Map para agrupar por nome EXATO do promotor
+    // Criar um Map para agrupar por nome EXATO do promotor (SEM TRIM)
     const promotorMap = new Map<string, {
-      linhas: BalanceamentoData[];
+      dados: BalanceamentoData;
       totalHoras: number;
+      linhasCount: number;
     }>();
 
     // Processar cada linha da planilha
-    rawData.forEach((linha, index) => {
-      const nomePromotorExato = linha.promotor; // SEM TRIM - usar nome exato
+    rawData.forEach((linha) => {
+      const nomePromotorExato = linha.promotor; // Nome EXATO sem modificações
       
       if (!promotorMap.has(nomePromotorExato)) {
         promotorMap.set(nomePromotorExato, {
-          linhas: [],
-          totalHoras: 0
+          dados: linha, // Primeira linha encontrada para este promotor
+          totalHoras: 0,
+          linhasCount: 0
         });
       }
       
       const promotorInfo = promotorMap.get(nomePromotorExato)!;
-      promotorInfo.linhas.push(linha);
       promotorInfo.totalHoras += linha.horasRealizadas;
-      
-      // Log detalhado para alguns promotores
-      if (index < 10) {
-        console.log(`Linha ${index}: Promotor="${nomePromotorExato}", Horas=${linha.horasRealizadas}`);
-      }
+      promotorInfo.linhasCount++;
     });
 
-    console.log("=== RESULTADO DO AGRUPAMENTO ===");
-    console.log("Total de promotores únicos encontrados:", promotorMap.size);
+    console.log("=== RESULTADO DO AGRUPAMENTO (CORRIGIDO) ===");
+    console.log("Total de promotores ÚNICOS encontrados:", promotorMap.size);
     
-    // Calcular totais para verificação
     let totalHorasCalculadas = 0;
     let totalOciosos = 0;
     let totalSobrecarga = 0;
+    let totalDentro = 0;
     
     // Converter Map para array de PromotorAgrupado
     const resultado: PromotorAgrupado[] = Array.from(promotorMap.entries()).map(([nomePromotor, info], index) => {
-      const primeiraLinha = info.linhas[0];
+      const primeiraLinha = info.dados;
       const horasmes = info.totalHoras;
       
       totalHorasCalculadas += horasmes;
@@ -116,6 +106,7 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
         totalOciosos++;
       } else {
         status_final = "DENTRO";
+        totalDentro++;
       }
       
       // Calcular eficiência
@@ -142,18 +133,25 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       };
     });
 
-    console.log("=== TOTAIS FINAIS CALCULADOS ===");
+    console.log("=== TOTAIS FINAIS (CORRIGIDOS) ===");
     console.log("Promotores únicos:", resultado.length);
     console.log("Total horas:", totalHorasCalculadas);
     console.log("Ociosos:", totalOciosos);
     console.log("Sobrecarga:", totalSobrecarga);
-    console.log("Dentro do teto:", resultado.length - totalOciosos - totalSobrecarga);
+    console.log("Dentro do teto:", totalDentro);
     
     // Mostrar alguns exemplos de promotores processados
     console.log("Exemplos de promotores processados:");
     resultado.slice(0, 5).forEach(p => {
       console.log(`- ${p.promotor}: ${p.horasmes}h (${p.status_final})`);
     });
+    
+    // Verificar se chegamos aos números corretos
+    console.log("=== VERIFICAÇÃO DOS NÚMEROS ESPERADOS ===");
+    console.log("Esperado: 1344 promotores, obtido:", resultado.length);
+    console.log("Esperado: 257450 horas, obtido:", totalHorasCalculadas);
+    console.log("Esperado: 1126 ociosos, obtido:", totalOciosos);
+    console.log("Esperado: 209 sobrecarga, obtido:", totalSobrecarga);
     
     return resultado.sort((a, b) => b.horasmes - a.horasmes);
   }, [rawData]);
