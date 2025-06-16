@@ -40,81 +40,109 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
       
-      if (jsonData.length < 2) {
-        onError("A planilha deve conter pelo menos um cabeçalho e uma linha de dados.");
+      console.log("Dados brutos da planilha:", jsonData);
+      
+      if (!jsonData || jsonData.length < 2) {
+        onError("A planilha está vazia ou não contém dados suficientes.");
         return;
       }
 
-      const headers = jsonData[0] as string[];
+      const headers = (jsonData[0] as string[]) || [];
       const rows = jsonData.slice(1) as any[][];
 
-      // Mapear colunas esperadas
+      console.log("Cabeçalhos encontrados:", headers);
+
+      // Mapear colunas de forma mais flexível
       const colIndexes = {
-        promotor: findColumnIndex(headers, ['PROMOTOR', 'Promotor', 'Nome']),
-        perfil: findColumnIndex(headers, ['Perfil Promotor', 'Perfil', 'PERFIL']),
-        horasmes: findColumnIndex(headers, ['HORASMES', 'Horas Mes', 'Horas']),
-        coordenador: findColumnIndex(headers, ['Coordenador', 'COORDENADOR']),
-        regional: findColumnIndex(headers, ['Regional', 'REGIONAL']),
-        loja: findColumnIndex(headers, ['NOME', 'Loja', 'Nome Loja']),
-        uf: findColumnIndex(headers, ['UF', 'Estado']),
-        cidade: findColumnIndex(headers, ['Cidade', 'CIDADE'])
+        promotor: findColumnIndex(headers, ['PROMOTOR', 'Promotor', 'Nome', 'nome']),
+        perfil: findColumnIndex(headers, ['Perfil Promotor', 'Perfil', 'PERFIL', 'perfil']),
+        horasmes: findColumnIndex(headers, ['HORASMES', 'Horas Mes', 'Horas', 'horas']),
+        coordenador: findColumnIndex(headers, ['Coordenador', 'COORDENADOR', 'coordenador']),
+        regional: findColumnIndex(headers, ['Regional', 'REGIONAL', 'regional']),
+        loja: findColumnIndex(headers, ['NOME', 'Loja', 'Nome Loja', 'loja']),
+        uf: findColumnIndex(headers, ['UF', 'Estado', 'uf']),
+        cidade: findColumnIndex(headers, ['Cidade', 'CIDADE', 'cidade'])
       };
 
-      const dadosProcessados: BalanceamentoData[] = rows
-        .filter(row => row.length > 0 && row[colIndexes.promotor])
-        .map((row, index) => {
-          const promotor = row[colIndexes.promotor] || `Promotor ${index + 1}`;
-          const perfil = String(row[colIndexes.perfil] || 'promotor').toLowerCase().trim();
-          const horasRealizadas = Number(row[colIndexes.horasmes]) || 0;
-          const teto = TETO_POR_PERFIL[perfil] || 220;
-          
-          const horasExcedentes = Math.max(0, horasRealizadas - teto);
-          const horasOciosas = Math.max(0, teto - horasRealizadas);
-          const eficiencia = teto > 0 ? Math.round((horasRealizadas / teto) * 100) : 0;
-          
-          let status: "excedente" | "ocioso" | "normal";
-          if (horasExcedentes > 0) status = "excedente";
-          else if (horasOciosas > 0) status = "ocioso";
-          else status = "normal";
+      console.log("Índices das colunas:", colIndexes);
 
-          return {
-            id: index + 1,
-            promotor: String(promotor),
-            coordenador: String(row[colIndexes.coordenador] || 'Não informado'),
-            uf: String(row[colIndexes.uf] || 'SP'),
-            cidade: String(row[colIndexes.cidade] || 'São Paulo'),
-            bairro: `Bairro ${index + 1}`,
-            regional: String(row[colIndexes.regional] || 'Regional 1'),
-            gestorRegional: `Gestor ${String(row[colIndexes.regional] || 'Regional 1')}`,
-            loja: String(row[colIndexes.loja] || `Loja ${String(index + 1).padStart(3, '0')}`),
-            supervisorLoja: `Supervisor ${index + 1}`,
-            horasMaximas: teto,
-            horasRealizadas,
-            horasExcedentes,
-            horasOciosas,
-            eficiencia,
-            data: new Date().toISOString().split('T')[0],
-            status
-          };
-        });
+      // Filtrar apenas linhas com dados válidos
+      const rowsValidas = rows.filter(row => {
+        return row && Array.isArray(row) && row.length > 0 && 
+               (colIndexes.promotor >= 0 ? row[colIndexes.promotor] : false);
+      });
 
-      if (dadosProcessados.length === 0) {
-        onError("Nenhum dado válido foi encontrado na planilha.");
+      console.log(`Linhas válidas encontradas: ${rowsValidas.length}`);
+
+      if (rowsValidas.length === 0) {
+        onError("Nenhuma linha válida encontrada. Verifique se a planilha contém dados na coluna PROMOTOR.");
         return;
       }
 
+      const dadosProcessados: BalanceamentoData[] = rowsValidas.map((row, index) => {
+        const promotorValue = colIndexes.promotor >= 0 ? row[colIndexes.promotor] : null;
+        const promotor = String(promotorValue || `Promotor ${index + 1}`).trim();
+        
+        const perfilValue = colIndexes.perfil >= 0 ? row[colIndexes.perfil] : 'promotor';
+        const perfil = String(perfilValue || 'promotor').toLowerCase().trim();
+        
+        const horasValue = colIndexes.horasmes >= 0 ? row[colIndexes.horasmes] : 0;
+        const horasRealizadas = Number(horasValue) || 0;
+        
+        const teto = TETO_POR_PERFIL[perfil] || 220;
+        
+        const horasExcedentes = Math.max(0, horasRealizadas - teto);
+        const horasOciosas = Math.max(0, teto - horasRealizadas);
+        const eficiencia = teto > 0 ? Math.round((horasRealizadas / teto) * 100) : 0;
+        
+        let status: "excedente" | "ocioso" | "normal";
+        if (horasExcedentes > 0) status = "excedente";
+        else if (horasOciosas > 0) status = "ocioso";
+        else status = "normal";
+
+        const coordenador = colIndexes.coordenador >= 0 ? String(row[colIndexes.coordenador] || 'Não informado') : 'Não informado';
+        const regional = colIndexes.regional >= 0 ? String(row[colIndexes.regional] || 'Regional 1') : 'Regional 1';
+        const uf = colIndexes.uf >= 0 ? String(row[colIndexes.uf] || 'SP') : 'SP';
+        const cidade = colIndexes.cidade >= 0 ? String(row[colIndexes.cidade] || 'São Paulo') : 'São Paulo';
+        const loja = colIndexes.loja >= 0 ? String(row[colIndexes.loja] || `Loja ${String(index + 1).padStart(3, '0')}`) : `Loja ${String(index + 1).padStart(3, '0')}`;
+
+        return {
+          id: index + 1,
+          promotor,
+          coordenador,
+          uf,
+          cidade,
+          bairro: `Bairro ${index + 1}`,
+          regional,
+          gestorRegional: `Gestor ${regional}`,
+          loja,
+          supervisorLoja: `Supervisor ${index + 1}`,
+          horasMaximas: teto,
+          horasRealizadas,
+          horasExcedentes,
+          horasOciosas,
+          eficiencia,
+          data: new Date().toISOString().split('T')[0],
+          status
+        };
+      });
+
+      console.log("Dados processados:", dadosProcessados);
       onDataLoad(dadosProcessados);
     } catch (error) {
       console.error("Erro ao processar planilha:", error);
-      onError("Erro ao processar o arquivo. Verifique o formato da planilha.");
+      onError(`Erro ao processar o arquivo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   };
 
   const findColumnIndex = (headers: string[], possibleNames: string[]): number => {
     for (const name of possibleNames) {
-      const index = headers.findIndex(h => 
-        h && h.toString().toLowerCase().includes(name.toLowerCase())
-      );
+      const index = headers.findIndex(h => {
+        if (!h) return false;
+        const headerStr = String(h).toLowerCase().trim();
+        const nameStr = name.toLowerCase();
+        return headerStr.includes(nameStr) || headerStr === nameStr;
+      });
       if (index !== -1) return index;
     }
     return -1;
@@ -124,7 +152,7 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
       onError("Por favor, selecione um arquivo Excel (.xlsx ou .xls)");
       return;
     }
@@ -167,10 +195,11 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
                 <div>
                   <p className="font-medium mb-1">Formato esperado da planilha:</p>
                   <ul className="text-xs space-y-1 text-gray-500">
-                    <li>• Colunas: PROMOTOR, Perfil Promotor, HORASMES, Coordenador, Regional, Loja</li>
+                    <li>• Colunas obrigatórias: PROMOTOR, HORASMES</li>
+                    <li>• Colunas opcionais: Perfil Promotor, Coordenador, Regional, Loja, UF, Cidade</li>
                     <li>• Formato: .xlsx ou .xls</li>
+                    <li>• Primeira linha deve conter os cabeçalhos</li>
                     <li>• Os dados serão processados automaticamente com base no perfil do promotor</li>
-                    <li>• Cálculo automático de horas excedentes/ociosas baseado no teto por perfil</li>
                   </ul>
                 </div>
               </div>
