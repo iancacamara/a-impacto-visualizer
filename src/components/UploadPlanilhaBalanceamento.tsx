@@ -54,32 +54,49 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
 
       // Mapear colunas de forma mais flexível
       const colIndexes = {
-        promotor: findColumnIndex(headers, ['PROMOTOR', 'Promotor', 'Nome', 'nome']),
+        promotor: findColumnIndex(headers, ['PROMOTOR SUGERIDO', 'PROMOTOR', 'Promotor', 'Nome', 'nome']),
         perfil: findColumnIndex(headers, ['Perfil Promotor', 'Perfil', 'PERFIL', 'perfil']),
-        horasmes: findColumnIndex(headers, ['HORASMES', 'Horas Mes', 'Horas', 'horas']),
+        horasmes: findColumnIndex(headers, ['HORASMES', 'Horas Mes', 'Horas Mês', 'Horas', 'horas']),
         coordenador: findColumnIndex(headers, ['Coordenador', 'COORDENADOR', 'coordenador']),
         regional: findColumnIndex(headers, ['Regional', 'REGIONAL', 'regional']),
-        loja: findColumnIndex(headers, ['NOME', 'Loja', 'Nome Loja', 'loja']),
-        uf: findColumnIndex(headers, ['UF', 'Estado', 'uf']),
-        cidade: findColumnIndex(headers, ['Cidade', 'CIDADE', 'cidade'])
+        loja: findColumnIndex(headers, ['Nome Loja', 'NOME', 'Loja', 'loja']),
+        uf: findColumnIndex(headers, ['UF Loja', 'UF', 'Estado', 'uf']),
+        cidade: findColumnIndex(headers, ['Cidade Loja', 'Cidade', 'CIDADE', 'cidade'])
       };
 
       console.log("Índices das colunas:", colIndexes);
 
-      // Filtrar apenas linhas com dados válidos
+      // Filtrar apenas linhas com dados válidos - mudança na lógica
       const rowsValidas = rows.filter(row => {
-        return row && Array.isArray(row) && row.length > 0 && 
-               (colIndexes.promotor >= 0 ? row[colIndexes.promotor] : false);
+        if (!row || !Array.isArray(row) || row.length === 0) return false;
+        
+        // Verificar se há pelo menos um valor não vazio na linha
+        const hasData = row.some(cell => cell !== null && cell !== undefined && cell !== '');
+        
+        // Se encontrou a coluna PROMOTOR, verificar se tem valor
+        if (colIndexes.promotor >= 0) {
+          const promotorValue = row[colIndexes.promotor];
+          return hasData && promotorValue && String(promotorValue).trim() !== '';
+        }
+        
+        // Se não encontrou coluna PROMOTOR, verificar se há dados nas colunas de horas
+        if (colIndexes.horasmes >= 0) {
+          const horasValue = row[colIndexes.horasmes];
+          return hasData && horasValue && !isNaN(Number(horasValue));
+        }
+        
+        return hasData;
       });
 
       console.log(`Linhas válidas encontradas: ${rowsValidas.length}`);
 
       if (rowsValidas.length === 0) {
-        onError("Nenhuma linha válida encontrada. Verifique se a planilha contém dados na coluna PROMOTOR.");
+        onError("Nenhuma linha válida encontrada. Verifique se a planilha contém dados válidos.");
         return;
       }
 
       const dadosProcessados: BalanceamentoData[] = rowsValidas.map((row, index) => {
+        // Extrair dados da linha
         const promotorValue = colIndexes.promotor >= 0 ? row[colIndexes.promotor] : null;
         const promotor = String(promotorValue || `Promotor ${index + 1}`).trim();
         
@@ -89,17 +106,21 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
         const horasValue = colIndexes.horasmes >= 0 ? row[colIndexes.horasmes] : 0;
         const horasRealizadas = Number(horasValue) || 0;
         
-        const teto = TETO_POR_PERFIL[perfil] || 220;
+        // Calcular teto baseado no perfil
+        const teto = TETO_POR_PERFIL[perfil] || TETO_POR_PERFIL['promotor'] || 220;
         
+        // Calcular métricas
         const horasExcedentes = Math.max(0, horasRealizadas - teto);
         const horasOciosas = Math.max(0, teto - horasRealizadas);
         const eficiencia = teto > 0 ? Math.round((horasRealizadas / teto) * 100) : 0;
         
+        // Determinar status
         let status: "excedente" | "ocioso" | "normal";
         if (horasExcedentes > 0) status = "excedente";
         else if (horasOciosas > 0) status = "ocioso";
         else status = "normal";
 
+        // Extrair outros dados
         const coordenador = colIndexes.coordenador >= 0 ? String(row[colIndexes.coordenador] || 'Não informado') : 'Não informado';
         const regional = colIndexes.regional >= 0 ? String(row[colIndexes.regional] || 'Regional 1') : 'Regional 1';
         const uf = colIndexes.uf >= 0 ? String(row[colIndexes.uf] || 'SP') : 'SP';
@@ -128,6 +149,8 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
       });
 
       console.log("Dados processados:", dadosProcessados);
+      console.log(`Total de registros processados: ${dadosProcessados.length}`);
+      
       onDataLoad(dadosProcessados);
     } catch (error) {
       console.error("Erro ao processar planilha:", error);
@@ -195,8 +218,8 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
                 <div>
                   <p className="font-medium mb-1">Formato esperado da planilha:</p>
                   <ul className="text-xs space-y-1 text-gray-500">
-                    <li>• Colunas obrigatórias: PROMOTOR, HORASMES</li>
-                    <li>• Colunas opcionais: Perfil Promotor, Coordenador, Regional, Loja, UF, Cidade</li>
+                    <li>• Colunas obrigatórias: PROMOTOR SUGERIDO ou PROMOTOR, HORASMES</li>
+                    <li>• Colunas opcionais: Perfil Promotor, Coordenador, Regional, Nome Loja, UF Loja, Cidade Loja</li>
                     <li>• Formato: .xlsx ou .xls</li>
                     <li>• Primeira linha deve conter os cabeçalhos</li>
                     <li>• Os dados serão processados automaticamente com base no perfil do promotor</li>
