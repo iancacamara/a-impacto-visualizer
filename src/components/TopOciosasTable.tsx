@@ -10,10 +10,10 @@ interface TopOciosasTableProps {
 }
 
 const TopOciosasTable = ({ promotoresAgrupados }: TopOciosasTableProps) => {
-  // Top 10 Ociosos - ordenar por DIFERENCA_HORAS crescente (valores mais negativos primeiro)
+  // Top 10 Ociosos - apenas com DIFERENCA_HORAS < 0, ordenar por DIFERENCA_HORAS ASC (mais negativos primeiro)
   const topOciosos = promotoresAgrupados
-    .filter(p => p.status_final === "OCIOSO")
-    .sort((a, b) => a.diferenca_horas - b.diferenca_horas) // Crescente para pegar os mais negativos
+    .filter(p => p.diferenca_horas < 0)
+    .sort((a, b) => a.diferenca_horas - b.diferenca_horas) // ASC para pegar os mais negativos
     .slice(0, 10);
 
   return (
@@ -29,7 +29,7 @@ const TopOciosasTable = ({ promotoresAgrupados }: TopOciosasTableProps) => {
           <TableHeader>
             <TableRow className="bg-gray-800 text-white">
               <TableHead className="text-white font-semibold">PROMOTOR</TableHead>
-              <TableHead className="text-white font-semibold">Perfil</TableHead>
+              <TableHead className="text-white font-semibold">PERFIL</TableHead>
               <TableHead className="text-white font-semibold">HORASMES</TableHead>
               <TableHead className="text-white font-semibold">TETO</TableHead>
               <TableHead className="text-white font-semibold">DIFERENCA_HORAS</TableHead>

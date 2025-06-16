@@ -10,10 +10,10 @@ interface TopSobrecargaTableProps {
 }
 
 const TopSobrecargaTable = ({ promotoresAgrupados }: TopSobrecargaTableProps) => {
-  // Top 10 Sobrecarga - ordenar por DIFERENCA_HORAS decrescente (valores mais positivos primeiro)
+  // Top 10 Sobrecarga - apenas com DIFERENCA_HORAS > 0, ordenar por DIFERENCA_HORAS DESC (mais positivos primeiro)
   const topSobrecarga = promotoresAgrupados
-    .filter(p => p.status_final === "SOBRECARGA")
-    .sort((a, b) => b.diferenca_horas - a.diferenca_horas) // Decrescente para pegar os mais positivos
+    .filter(p => p.diferenca_horas > 0)
+    .sort((a, b) => b.diferenca_horas - a.diferenca_horas) // DESC para pegar os mais positivos
     .slice(0, 10);
 
   return (
@@ -29,7 +29,7 @@ const TopSobrecargaTable = ({ promotoresAgrupados }: TopSobrecargaTableProps) =>
           <TableHeader>
             <TableRow className="bg-gray-800 text-white">
               <TableHead className="text-white font-semibold">PROMOTOR</TableHead>
-              <TableHead className="text-white font-semibold">Perfil</TableHead>
+              <TableHead className="text-white font-semibold">PERFIL</TableHead>
               <TableHead className="text-white font-semibold">HORASMES</TableHead>
               <TableHead className="text-white font-semibold">TETO</TableHead>
               <TableHead className="text-white font-semibold">DIFERENCA_HORAS</TableHead>

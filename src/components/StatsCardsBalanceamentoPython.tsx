@@ -13,8 +13,8 @@ const StatsCardsBalanceamentoPython = ({ promotoresAgrupados }: StatsCardsBalanc
   // Calcular métricas exatamente como especificado
   const totalPromotores = promotoresAgrupados.length;
   const horasTotais = promotoresAgrupados.reduce((sum, p) => sum + p.horasmes, 0);
-  const ociosos = promotoresAgrupados.filter(p => p.status_final === "OCIOSO").length;
-  const sobrecarga = promotoresAgrupados.filter(p => p.status_final === "SOBRECARGA").length;
+  const ociosos = promotoresAgrupados.filter(p => p.diferenca_horas < 0).length;
+  const sobrecarga = promotoresAgrupados.filter(p => p.diferenca_horas > 0).length;
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },

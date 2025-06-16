@@ -45,15 +45,15 @@ export const useFiltersBalanceamento = (promotoresAgrupados: PromotorAgrupado[])
       const matchesCoordenador = !filters.selectedCoordenador || item.coordenador === filters.selectedCoordenador;
       const matchesSupervisorLoja = !filters.selectedSupervisorLoja || item.supervisorLoja === filters.selectedSupervisorLoja;
       
-      // Mapear status do filtro para o status_final
+      // Mapear status do filtro para o status_final baseado em DIFERENCA_HORAS
       let matchesStatus = true;
       if (filters.selectedStatus) {
         if (filters.selectedStatus === "excedente") {
-          matchesStatus = item.status_final === "SOBRECARGA";
+          matchesStatus = item.diferenca_horas > 0; // SOBRECARGA
         } else if (filters.selectedStatus === "ocioso") {
-          matchesStatus = item.status_final === "OCIOSO";
+          matchesStatus = item.diferenca_horas < 0; // OCIOSO
         } else if (filters.selectedStatus === "normal") {
-          matchesStatus = item.status_final === "DENTRO";
+          matchesStatus = item.diferenca_horas === 0; // DENTRO
         }
       }
       

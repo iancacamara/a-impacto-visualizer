@@ -25,12 +25,12 @@ const VisaoPorLojaTable = ({ promotoresAgrupados }: VisaoPorLojaTableProps) => {
     acc[key].total_promotores += 1;
     acc[key].total_horas_mes += curr.horasmes;
     
-    // Horas excedentes: soma apenas valores positivos de diferenca_horas
+    // Horas excedentes: soma apenas DIFERENCA_HORAS > 0
     if (curr.diferenca_horas > 0) {
       acc[key].horas_excedentes += curr.diferenca_horas;
     }
     
-    // Horas ociosas: soma valores negativos em valor absoluto
+    // Horas ociosas: soma DIFERENCA_HORAS < 0 (valor absoluto)
     if (curr.diferenca_horas < 0) {
       acc[key].horas_ociosas += Math.abs(curr.diferenca_horas);
     }
