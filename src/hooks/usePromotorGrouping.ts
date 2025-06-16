@@ -46,54 +46,85 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
       return [];
     }
 
-    console.log("Dados brutos recebidos:", rawData.length, "linhas");
-
-    // Agrupar por nome do promotor (exatamente igual ao nome na planilha)
-    const grupos = rawData.reduce((acc, curr) => {
-      const nomePromotor = curr.promotor.trim(); // Usar exatamente como vem da planilha
-      if (!acc[nomePromotor]) {
-        acc[nomePromotor] = [];
-      }
-      acc[nomePromotor].push(curr);
-      return acc;
-    }, {} as Record<string, BalanceamentoData[]>);
-
-    console.log("Promotores únicos encontrados:", Object.keys(grupos).length);
-    console.log("Alguns exemplos de promotores:", Object.keys(grupos).slice(0, 5));
-
-    // Processar cada grupo de promotor para criar UM ÚNICO registro por promotor
-    const resultado: PromotorAgrupado[] = [];
+    console.log("=== INÍCIO DO PROCESSAMENTO ===");
+    console.log("Total de linhas na planilha:", rawData.length);
     
-    Object.entries(grupos).forEach(([nomePromotor, linhas]) => {
-      // Usar dados da primeira linha para informações não-agregáveis
-      const primeiraLinha = linhas[0];
+    // Log dos primeiros registros para verificar os dados
+    console.log("Primeiros 3 registros:", rawData.slice(0, 3).map(r => ({
+      promotor: r.promotor,
+      horasRealizadas: r.horasRealizadas,
+      perfil: r.perfil
+    })));
+
+    // Criar um Map para agrupar por nome EXATO do promotor
+    const promotorMap = new Map<string, {
+      linhas: BalanceamentoData[];
+      totalHoras: number;
+    }>();
+
+    // Processar cada linha da planilha
+    rawData.forEach((linha, index) => {
+      const nomePromotorExato = linha.promotor; // SEM TRIM - usar nome exato
       
-      // SOMAR todas as horas de todas as linhas deste promotor
-      const horasmes = linhas.reduce((sum, linha) => sum + linha.horasRealizadas, 0);
+      if (!promotorMap.has(nomePromotorExato)) {
+        promotorMap.set(nomePromotorExato, {
+          linhas: [],
+          totalHoras: 0
+        });
+      }
       
-      // Usar perfil da primeira linha
-      const perfilOriginal = primeiraLinha.perfil || 'promotor';
-      const perfilParaCalculo = perfilOriginal.toLowerCase().trim();
+      const promotorInfo = promotorMap.get(nomePromotorExato)!;
+      promotorInfo.linhas.push(linha);
+      promotorInfo.totalHoras += linha.horasRealizadas;
+      
+      // Log detalhado para alguns promotores
+      if (index < 10) {
+        console.log(`Linha ${index}: Promotor="${nomePromotorExato}", Horas=${linha.horasRealizadas}`);
+      }
+    });
+
+    console.log("=== RESULTADO DO AGRUPAMENTO ===");
+    console.log("Total de promotores únicos encontrados:", promotorMap.size);
+    
+    // Calcular totais para verificação
+    let totalHorasCalculadas = 0;
+    let totalOciosos = 0;
+    let totalSobrecarga = 0;
+    
+    // Converter Map para array de PromotorAgrupado
+    const resultado: PromotorAgrupado[] = Array.from(promotorMap.entries()).map(([nomePromotor, info], index) => {
+      const primeiraLinha = info.linhas[0];
+      const horasmes = info.totalHoras;
+      
+      totalHorasCalculadas += horasmes;
       
       // Calcular teto baseado no perfil
-      const teto = TETO_POR_PERFIL[perfilParaCalculo] || TETO_POR_PERFIL['promotor'];
+      const perfilOriginal = primeiraLinha.perfil || 'promotorexpress';
+      const perfilParaCalculo = perfilOriginal.toLowerCase().trim();
+      const teto = TETO_POR_PERFIL[perfilParaCalculo] || TETO_POR_PERFIL['promotorexpress'] || 320;
       
       // Calcular diferença
       const diferenca_horas = horasmes - teto;
       
-      // Determinar status
+      // Determinar status e contar
       let status_final: "SOBRECARGA" | "OCIOSO" | "DENTRO";
-      if (diferenca_horas > 0) status_final = "SOBRECARGA";
-      else if (diferenca_horas < 0) status_final = "OCIOSO";
-      else status_final = "DENTRO";
+      if (diferenca_horas > 0) {
+        status_final = "SOBRECARGA";
+        totalSobrecarga++;
+      } else if (diferenca_horas < 0) {
+        status_final = "OCIOSO";
+        totalOciosos++;
+      } else {
+        status_final = "DENTRO";
+      }
       
       // Calcular eficiência
       const eficiencia = teto > 0 ? Math.round((horasmes / teto) * 100 * 10) / 10 : 0;
       
-      resultado.push({
-        id: `promotor-${resultado.length + 1}`,
-        promotor: nomePromotor, // Nome exato da planilha
-        perfil: perfilOriginal, // Perfil original da planilha
+      return {
+        id: `promotor-${index + 1}`,
+        promotor: nomePromotor,
+        perfil: perfilOriginal,
         horasmes,
         teto,
         diferenca_horas,
@@ -108,13 +139,23 @@ export const usePromotorGrouping = (rawData: BalanceamentoData[]) => {
         cidade: primeiraLinha.cidade,
         bairro: primeiraLinha.bairro,
         data: primeiraLinha.data
-      });
+      };
     });
 
-    console.log("Total de promotores únicos processados:", resultado.length);
-    console.log("Exemplo de promotor processado:", resultado[0]);
+    console.log("=== TOTAIS FINAIS CALCULADOS ===");
+    console.log("Promotores únicos:", resultado.length);
+    console.log("Total horas:", totalHorasCalculadas);
+    console.log("Ociosos:", totalOciosos);
+    console.log("Sobrecarga:", totalSobrecarga);
+    console.log("Dentro do teto:", resultado.length - totalOciosos - totalSobrecarga);
     
-    return resultado.sort((a, b) => b.horasmes - a.horasmes); // Ordenar por horas desc
+    // Mostrar alguns exemplos de promotores processados
+    console.log("Exemplos de promotores processados:");
+    resultado.slice(0, 5).forEach(p => {
+      console.log(`- ${p.promotor}: ${p.horasmes}h (${p.status_final})`);
+    });
+    
+    return resultado.sort((a, b) => b.horasmes - a.horasmes);
   }, [rawData]);
 
   return promotoresAgrupados;
