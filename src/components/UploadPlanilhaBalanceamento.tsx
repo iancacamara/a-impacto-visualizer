@@ -116,8 +116,8 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
         }
 
         const promotor = String(promotorValue || `Promotor ${index + 1}`).trim();
-        const perfilValue = colIndexes.perfil >= 0 ? row[colIndexes.perfil] : 'promotor';
-        const perfil = String(perfilValue || 'promotor').toLowerCase().trim();
+        const perfilValue = colIndexes.perfil >= 0 ? row[colIndexes.perfil] : 'promotorexpress';
+        const perfil = String(perfilValue || 'promotorexpress').toLowerCase().trim();
         const horasRealizadas = Number(horasValue) || 0;
 
         // Calcular teto baseado no perfil
@@ -173,7 +173,8 @@ const UploadPlanilhaBalanceamento = ({ onDataLoad, onError }: UploadPlanilhaBala
           horasOciosas,
           eficiencia,
           data: new Date().toISOString().split('T')[0],
-          status
+          status,
+          perfil // Adicionando o campo perfil
         };
 
         dadosProcessados.push(dadoProcessado);

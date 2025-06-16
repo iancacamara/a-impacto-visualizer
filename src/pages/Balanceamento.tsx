@@ -2,15 +2,16 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import FilterBarBalanceamento from "../components/FilterBarBalanceamento";
-import StatsCardsBalanceamento from "../components/StatsCardsBalanceamento";
-import ChartsBalanceamento from "../components/ChartsBalanceamento";
-import DetailedTablesBalanceamento from "../components/DetailedTablesBalanceamento";
 import UploadPlanilhaBalanceamento from "../components/UploadPlanilhaBalanceamento";
+import StatsCardsBalanceamentoPython from "../components/StatsCardsBalanceamentoPython";
+import TopOciosasTable from "../components/TopOciosasTable";
+import TopSobrecargaTable from "../components/TopSobrecargaTable";
+import VisaoPorCoordenadorTable from "../components/VisaoPorCoordenadorTable";
+import VisaoPorLojaTable from "../components/VisaoPorLojaTable";
+import VisaoPorRegionalTable from "../components/VisaoPorRegionalTable";
 import { useFiltersBalanceamento } from "../hooks/useFiltersBalanceamento";
-import { useChartDataBalanceamento } from "../hooks/useChartDataBalanceamento";
 import { balanceamentoData as initialData } from "../data/balanceamentoData";
-import { BalanceamentoData, BalanceamentoStats } from "../types/balanceamento";
-import { ArrowLeft } from "lucide-react";
+import { BalanceamentoData } from "../types/balanceamento";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,7 +24,6 @@ const Balanceamento = () => {
   const [dadosCarregados, setDadosCarregados] = useState(false);
   
   const { filters, setFilters, resetAllFilters, filteredData } = useFiltersBalanceamento(balanceamentoData);
-  const chartData = useChartDataBalanceamento(filteredData);
 
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
@@ -56,19 +56,8 @@ const Balanceamento = () => {
   const supervisoresLoja = [...new Set(balanceamentoData.map(p => p.supervisorLoja))].filter(Boolean).sort();
   const statusOptions = ["excedente", "ocioso", "normal"];
 
-  // Calculate statistics based on filtered data
-  const stats: BalanceamentoStats = {
-    totalPromotores: filteredData.length,
-    horasExcedentesTotal: filteredData.reduce((sum, p) => sum + p.horasExcedentes, 0),
-    horasOciosasTotal: filteredData.reduce((sum, p) => sum + p.horasOciosas, 0),
-    eficienciaMedia: filteredData.length > 0 ? 
-      filteredData.reduce((sum, p) => sum + p.eficiencia, 0) / filteredData.length : 0,
-    promotoresExcedentes: filteredData.filter(p => p.status === "excedente").length,
-    promotoresOciosos: filteredData.filter(p => p.status === "ocioso").length,
-  };
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Header 
         lastUpdate={lastUpdate} 
         onClearFilters={resetAllFilters}
@@ -106,9 +95,16 @@ const Balanceamento = () => {
           statusOptions={statusOptions}
         />
 
-        <StatsCardsBalanceamento stats={stats} />
-        <ChartsBalanceamento chartData={chartData} />
-        <DetailedTablesBalanceamento filteredData={filteredData} />
+        <StatsCardsBalanceamentoPython filteredData={filteredData} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <TopOciosasTable filteredData={filteredData} />
+          <TopSobrecargaTable filteredData={filteredData} />
+        </div>
+
+        <VisaoPorCoordenadorTable filteredData={filteredData} />
+        <VisaoPorLojaTable filteredData={filteredData} />
+        <VisaoPorRegionalTable filteredData={filteredData} />
       </div>
     </div>
   );

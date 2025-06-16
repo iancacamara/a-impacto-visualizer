@@ -1,4 +1,3 @@
-
 export interface BalanceamentoData {
   id: number;
   coordenador: string;
@@ -17,6 +16,7 @@ export interface BalanceamentoData {
   eficiencia: number;
   data: string;
   status: "excedente" | "ocioso" | "normal";
+  perfil?: string; // Novo campo para suportar o perfil do promotor
 }
 
 export interface BalanceamentoStats {
