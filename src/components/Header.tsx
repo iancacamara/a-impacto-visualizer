@@ -54,8 +54,8 @@ const Header = ({
             )}
             <div className="relative">
               <img 
-                src="/lovable-uploads/1419f815-c548-4d18-914c-14b8e01040e1.png" 
-                alt="Supera Holdings" 
+                src="/lovable-uploads/9a67413b-7982-4d25-9367-ce54c809f137.png" 
+                alt="GMPromo" 
                 className="h-16 w-auto drop-shadow-lg"
               />
             </div>
